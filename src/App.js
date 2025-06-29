@@ -150,6 +150,30 @@ function App() {
     }
   };
 
+  // Comprehensive Gold Strike Analysis - combines all insights
+  const strikeGold = async () => {
+    if (!conversationData) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('⛏️ Starting comprehensive prospecting analysis for:', conversationData.id);
+      
+      const messages = await MissiveAPI.getConversationMessages(conversationData);
+      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+      
+      // Call comprehensive analysis that combines everything
+      const goldStrike = await OpenAIAPI.comprehensiveProspectAnalysis(conversationText);
+      setAnalysis(goldStrike);
+    } catch (err) {
+      console.error('❌ Gold prospecting error:', err);
+      setError(err.message || 'Failed to prospect this lead');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const formatAnalysisContent = (text) => {
     if (!text) return [];
     
@@ -184,10 +208,15 @@ function App() {
   };
 
   const getRatingClass = (rating) => {
-    if (rating.includes('HIGH FIT')) return 'high-fit';
-    if (rating.includes('MEDIUM FIT')) return 'medium-fit';
-    if (rating.includes('LOW FIT')) return 'low-fit';
-    if (rating.includes('POOR FIT')) return 'poor-fit';
+    if (rating.includes('GOLD STRIKE')) return 'gold-strike';
+    if (rating.includes('SILVER NUGGET')) return 'silver-nugget';
+    if (rating.includes('COPPER FIND')) return 'copper-find';
+    if (rating.includes('FOOL\'S GOLD')) return 'fools-gold';
+    // Fallback for old format
+    if (rating.includes('HIGH FIT')) return 'gold-strike';
+    if (rating.includes('MEDIUM FIT')) return 'silver-nugget';
+    if (rating.includes('LOW FIT')) return 'copper-find';
+    if (rating.includes('POOR FIT')) return 'fools-gold';
     return 'unknown-fit';
   };
 
@@ -197,34 +226,49 @@ function App() {
 
     const metrics = {};
     
-    // Extract rating
-    const ratingMatch = analysisText.match(/\*\*RATING:\s*([^*]+)\*\*/i);
-    if (ratingMatch) {
-      metrics.rating = ratingMatch[1].trim();
+    // Extract prospect rating (new gold mining format)
+    const prospectRatingMatch = analysisText.match(/\*\*⭐\s*PROSPECT RATING:\s*([^*]+)\*\*/i);
+    if (prospectRatingMatch) {
+      metrics.rating = prospectRatingMatch[1].trim();
+    } else {
+      // Fallback to old format
+      const ratingMatch = analysisText.match(/\*\*RATING:\s*([^*]+)\*\*/i);
+      if (ratingMatch) {
+        metrics.rating = ratingMatch[1].trim();
+      }
     }
 
-    // Extract sentiment
-    const sentimentMatch = analysisText.match(/\*\*SENTIMENT:\s*([^*]+)\*\*/i);
+    // Extract sentiment from the new format
+    const sentimentMatch = analysisText.match(/\*\*😊\s*SENTIMENT & RELATIONSHIP:\s*([^*]+)\*\*/i);
     if (sentimentMatch) {
-      metrics.sentiment = sentimentMatch[1].trim();
-    } else if (analysisText.toLowerCase().includes('positive')) {
-      metrics.sentiment = 'Positive';
-    } else if (analysisText.toLowerCase().includes('negative')) {
-      metrics.sentiment = 'Negative';
-    } else if (analysisText.toLowerCase().includes('neutral')) {
-      metrics.sentiment = 'Neutral';
+      const sentimentText = sentimentMatch[1].trim();
+      if (sentimentText.toLowerCase().includes('positive') || sentimentText.toLowerCase().includes('excited') || sentimentText.toLowerCase().includes('eager')) {
+        metrics.sentiment = 'Positive';
+      } else if (sentimentText.toLowerCase().includes('negative') || sentimentText.toLowerCase().includes('frustrated') || sentimentText.toLowerCase().includes('unhappy')) {
+        metrics.sentiment = 'Negative';
+      } else {
+        metrics.sentiment = 'Neutral';
+      }
     }
 
-    // Extract opportunity score
-    const opportunityMatch = analysisText.match(/\*\*OPPORTUNITY:\s*([^*]+)\*\*/i);
+    // Extract opportunity assessment
+    const opportunityMatch = analysisText.match(/\*\*💰\s*OPPORTUNITY ASSESSMENT:\s*([^*]+)\*\*/i);
     if (opportunityMatch) {
-      metrics.opportunity = opportunityMatch[1].trim();
+      const oppText = opportunityMatch[1].trim();
+      metrics.opportunity = oppText.substring(0, 50) + (oppText.length > 50 ? '...' : '');
     }
 
-    // Extract urgency
-    const urgencyMatch = analysisText.match(/\*\*URGENCY:\s*([^*]+)\*\*/i);
+    // Extract urgency signals
+    const urgencyMatch = analysisText.match(/\*\*⚡\s*URGENCY SIGNALS:\s*([^*]+)\*\*/i);
     if (urgencyMatch) {
-      metrics.urgency = urgencyMatch[1].trim();
+      const urgencyText = urgencyMatch[1].trim();
+      if (urgencyText.toLowerCase().includes('immediate') || urgencyText.toLowerCase().includes('urgent') || urgencyText.toLowerCase().includes('asap')) {
+        metrics.urgency = 'High';
+      } else if (urgencyText.toLowerCase().includes('soon') || urgencyText.toLowerCase().includes('weeks') || urgencyText.toLowerCase().includes('month')) {
+        metrics.urgency = 'Medium';
+      } else {
+        metrics.urgency = 'Low';
+      }
     }
 
     return Object.keys(metrics).length > 0 ? metrics : null;
@@ -276,14 +320,14 @@ function App() {
   return (
     <div className="app-container">
       <div className="sidebar-header">
-        <h1>Sales Assistant</h1>
-        <p>AI-powered conversation analysis</p>
+        <h1>⛏️ Gold Prospector</h1>
+        <p>Strike sales gold with AI-powered lead prospecting</p>
       </div>
 
       <div className="sidebar-content">
         {!conversationData ? (
           <div className="no-conversation">
-            <p>👈 Select a conversation to analyze</p>
+            <p>👈 Select a lead to prospect for gold</p>
             <div className="debug-info-small">
               <details>
                 <summary>Debug Info</summary>
@@ -296,29 +340,29 @@ function App() {
             {/* Scorecard */}
             {scorecard && (
               <div className="scorecard">
-                <h4>📊 Analysis Scorecard</h4>
+                <h4>🏆 Prospector's Scorecard</h4>
                 <div className="scorecard-grid">
                   {scorecard.rating && (
                     <div className={`scorecard-item rating ${getRatingClass(scorecard.rating)}`}>
-                      <div className="scorecard-label">Lead Rating</div>
+                      <div className="scorecard-label">Prospect Grade</div>
                       <div className="scorecard-value">{scorecard.rating}</div>
                     </div>
                   )}
                   {scorecard.sentiment && (
                     <div className="scorecard-item sentiment">
-                      <div className="scorecard-label">Sentiment</div>
+                      <div className="scorecard-label">Attitude</div>
                       <div className="scorecard-value">{scorecard.sentiment}</div>
                     </div>
                   )}
                   {scorecard.opportunity && (
                     <div className="scorecard-item opportunity">
-                      <div className="scorecard-label">Opportunity</div>
+                      <div className="scorecard-label">Gold Potential</div>
                       <div className="scorecard-value">{scorecard.opportunity}</div>
                     </div>
                   )}
                   {scorecard.urgency && (
                     <div className="scorecard-item urgency">
-                      <div className="scorecard-label">Urgency</div>
+                      <div className="scorecard-label">Strike Timeline</div>
                       <div className="scorecard-value">{scorecard.urgency}</div>
                     </div>
                   )}
@@ -328,37 +372,12 @@ function App() {
 
             <div className="action-buttons">
               <button 
-                className="analyze-btn primary freight-btn"
-                onClick={qualifyFreightLead}
+                className="analyze-btn primary gold-strike-btn"
+                onClick={strikeGold}
                 disabled={loading}
               >
-                {loading ? 'Qualifying Lead...' : '🚚 Qualify Freight Lead'}
+                {loading ? '⛏️ Prospecting Lead...' : '💰 Strike Gold!'}
               </button>
-              
-              <button 
-                className="analyze-btn primary"
-                onClick={analyzeConversation}
-                disabled={loading}
-              >
-                {loading ? 'Analyzing...' : '🤖 Full Analysis'}
-              </button>
-              
-              <div className="quick-actions">
-                <button 
-                  className="analyze-btn secondary"
-                  onClick={quickSentiment}
-                  disabled={loading}
-                >
-                  😊 Sentiment
-                </button>
-                <button 
-                  className="analyze-btn secondary"
-                  onClick={quickActions}
-                  disabled={loading}
-                >
-                  📋 Actions
-                </button>
-              </div>
             </div>
 
             {error && (
@@ -369,7 +388,7 @@ function App() {
 
             {analysis && (
               <div className="analysis-results">
-                <h4>📊 Analysis Results</h4>
+                <h4>⛏️ Prospector's Report</h4>
                 <div className="analysis-content">
                   {formatAnalysisContent(analysis)}
                 </div>

@@ -163,4 +163,73 @@ Keep your analysis concise, actionable, and focused on sales outcomes. Use bulle
       customPrompt: 'Extract the key action items and next steps from this email conversation. List them as bullet points.'
     });
   }
+
+  static async comprehensiveProspectAnalysis(conversationText) {
+    return this.analyzeSalesConversation(conversationText, {
+      maxTokens: 1500,
+      temperature: 0.2,
+      customPrompt: this.getGoldProspectorPrompt()
+    });
+  }
+
+  static getGoldProspectorPrompt() {
+    return `🏜️ You are a seasoned sales prospector with a gold miner's eye for valuable leads. Analyze this customer inquiry like you're panning for sales gold - look for the precious nuggets of opportunity!
+
+IDEAL CUSTOMER PROFILE (Your "Gold Mine"):
+- North American freight forwarder (U.S., Canada, or Mexico)
+- Handles at least 100+ shipments per month (volume = value!)
+- Primary modes: Air freight, LTL, cartage, linehaul, or small parcel
+- U.S. companies must be IAC-certified, Canada/Mexico need IATA accreditation
+- Often SMBs or new IACs looking for their first operational platform
+- Value fast quoting, operational efficiency, and excellent support
+
+🌟 TREASURE SIGNALS (Extra valuable leads):
+- Referrals from partners (Rippy, CaptainCargo, WorldTrak, other freight forwarders)
+- Former users of our platform returning
+- Companies mentioning they need a "first operational platform"
+- New to the business and growing fast
+
+⚠️ FOOL'S GOLD (Not worth pursuing):
+- Direct shippers (not freight forwarders)
+- Ocean-only forwarders
+- Companies lacking proper certifications
+- Outside North America
+
+FORMAT YOUR PROSPECTOR'S REPORT EXACTLY LIKE THIS:
+
+**⭐ PROSPECT RATING: [GOLD STRIKE! / SILVER NUGGET / COPPER FIND / FOOL'S GOLD]**
+
+**🔍 PROSPECT PROFILE:**
+[2-3 sentences about who they are and what they do]
+
+**💰 OPPORTUNITY ASSESSMENT:**
+[Analyze the sales potential - volume, growth signs, budget indicators]
+
+**😊 SENTIMENT & RELATIONSHIP:**
+[How they feel about their current situation and their attitude toward change]
+
+**⚡ URGENCY SIGNALS:**
+[Timeline pressures, pain points driving immediate need]
+
+**🎯 GOLD NUGGETS (Key Selling Points):**
+- [Bullet point 1: Specific value proposition for this prospect]
+- [Bullet point 2: Another compelling reason they should buy]
+- [Bullet point 3: Third key benefit]
+
+**📞 PROSPECTOR'S NEXT MOVES:**
+- [Immediate action item 1]
+- [Follow-up strategy 2]
+- [Long-term cultivation plan 3]
+
+**🚨 POTENTIAL HAZARDS:**
+[Any red flags, competitor threats, or deal risks to watch out for]
+
+RATING GUIDE:
+- GOLD STRIKE!: Perfect fit, strong buying signals, high value
+- SILVER NUGGET: Good potential, worth significant investment
+- COPPER FIND: Some promise, investigate further
+- FOOL'S GOLD: Poor fit, minimal investment warranted
+
+Write like an experienced prospector who knows how to spot real treasure! Use confident, action-oriented language that gets salespeople excited to strike gold! 🏆`;
+  }
 } 
