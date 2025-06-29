@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MissiveAPI } from './utils/missiveApi';
 import { OpenAIAPI } from './utils/openaiApi';
+import { SecurityManager } from './utils/security';
 import './App.css';
 
 function App() {
@@ -12,11 +13,28 @@ function App() {
   const [commentAdded, setCommentAdded] = useState(false);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
+  const [securityStatus, setSecurityStatus] = useState(null);
 
   // Check if we're running inside Missive with debug info
   const isMissiveContext = MissiveAPI.checkAvailability();
 
   useEffect(() => {
+    // Security validation on startup
+    try {
+      console.log('🔒 Running initial security validation...');
+      SecurityManager.validateAccess();
+      console.log('✅ Initial security validation passed');
+      
+      // Get security status for debugging
+      const status = SecurityManager.getSecurityStatus();
+      setSecurityStatus(status);
+    } catch (securityError) {
+      console.error('🚨 Security validation failed on startup:', securityError);
+      setError(`Security Error: ${securityError.message}`);
+      setSecurityStatus({ error: securityError.message });
+      return; // Don't proceed with normal initialization
+    }
+
     // Debug logging
     console.log('🔍 App Debug Info:');
     console.log('- Window object:', typeof window);
@@ -24,11 +42,16 @@ function App() {
     console.log('- isMissiveContext:', isMissiveContext);
     console.log('- User Agent:', navigator.userAgent);
     console.log('- Current URL:', window.location.href);
+    console.log('- Referrer:', document.referrer);
+    console.log('- In iframe:', window.self !== window.top);
     
     setDebugInfo(`
       Missive Available: ${typeof window.Missive !== 'undefined'}
       Is Missive Context: ${isMissiveContext}
       URL: ${window.location.href}
+      Referrer: ${document.referrer}
+      In iframe: ${window.self !== window.top}
+      Security Status: ${securityStatus?.error ? 'FAILED' : 'PASSED'}
       Timestamp: ${new Date().toISOString()}
     `);
 
@@ -41,6 +64,26 @@ function App() {
     
     return cleanup;
   }, [isMissiveContext]);
+
+  // Security wrapper for API calls
+  const secureApiCall = async (apiFunction, functionName) => {
+    try {
+      // Validate security before each API call
+      console.log(`🔒 Validating security for ${functionName}...`);
+      SecurityManager.validateAccess();
+      console.log(`✅ Security validation passed for ${functionName}`);
+      
+      // Update security status
+      const status = SecurityManager.getSecurityStatus();
+      setSecurityStatus(status);
+      
+      // Execute the API function
+      return await apiFunction();
+    } catch (securityError) {
+      console.error(`🚨 Security validation failed for ${functionName}:`, securityError);
+      throw new Error(`Security Error: ${securityError.message}`);
+    }
+  };
 
   const handleConversationChange = async (conversation) => {
     console.log('🔄 App received conversation change:', conversation);
@@ -75,16 +118,20 @@ function App() {
     try {
       console.log('🔍 Starting full analysis for conversation:', conversationData.id);
       
-      // Get conversation messages using the updated API
-      const messages = await MissiveAPI.getConversationMessages(conversationData);
-      console.log('📨 Retrieved messages:', messages.length);
+      // Use secure API call wrapper
+      const analysis = await secureApiCall(async () => {
+        // Get conversation messages using the updated API
+        const messages = await MissiveAPI.getConversationMessages(conversationData);
+        console.log('📨 Retrieved messages:', messages.length);
+        
+        // Format messages for analysis
+        const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+        console.log('📝 Formatted conversation text length:', conversationText.length);
+        
+        // Call OpenAI API
+        return await OpenAIAPI.analyzeSalesConversation(conversationText);
+      }, 'Full Analysis');
       
-      // Format messages for analysis
-      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
-      console.log('📝 Formatted conversation text length:', conversationText.length);
-      
-      // Call OpenAI API
-      const analysis = await OpenAIAPI.analyzeSalesConversation(conversationText);
       setAnalysis(analysis);
     } catch (err) {
       console.error('❌ Analysis error:', err);
@@ -103,9 +150,13 @@ function App() {
     try {
       console.log('🚛 Starting freight lead qualification for:', conversationData.id);
       
-      const messages = await MissiveAPI.getConversationMessages(conversationData);
-      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
-      const qualification = await OpenAIAPI.qualifyFreightForwardingLead(conversationText);
+      // Use secure API call wrapper
+      const qualification = await secureApiCall(async () => {
+        const messages = await MissiveAPI.getConversationMessages(conversationData);
+        const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+        return await OpenAIAPI.qualifyFreightForwardingLead(conversationText);
+      }, 'Freight Lead Qualification');
+      
       setAnalysis(qualification);
     } catch (err) {
       console.error('❌ Freight qualification error:', err);
@@ -124,9 +175,13 @@ function App() {
     try {
       console.log('😊 Starting sentiment analysis for:', conversationData.id);
       
-      const messages = await MissiveAPI.getConversationMessages(conversationData);
-      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
-      const sentiment = await OpenAIAPI.quickSentimentAnalysis(conversationText);
+      // Use secure API call wrapper
+      const sentiment = await secureApiCall(async () => {
+        const messages = await MissiveAPI.getConversationMessages(conversationData);
+        const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+        return await OpenAIAPI.quickSentimentAnalysis(conversationText);
+      }, 'Sentiment Analysis');
+      
       setAnalysis(sentiment);
     } catch (err) {
       console.error('❌ Sentiment analysis error:', err);
@@ -145,9 +200,13 @@ function App() {
     try {
       console.log('📋 Extracting action items for:', conversationData.id);
       
-      const messages = await MissiveAPI.getConversationMessages(conversationData);
-      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
-      const actionItems = await OpenAIAPI.quickActionItems(conversationText);
+      // Use secure API call wrapper
+      const actionItems = await secureApiCall(async () => {
+        const messages = await MissiveAPI.getConversationMessages(conversationData);
+        const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+        return await OpenAIAPI.quickActionItems(conversationText);
+      }, 'Action Items Extraction');
+      
       setAnalysis(actionItems);
     } catch (err) {
       console.error('❌ Action items error:', err);
@@ -168,14 +227,18 @@ function App() {
     try {
       console.log('⛏️ Starting comprehensive gold digging analysis for:', conversationData.id);
       
-      const messages = await MissiveAPI.getConversationMessages(conversationData);
-      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+      // Use secure API call wrapper
+      const goldStrike = await secureApiCall(async () => {
+        const messages = await MissiveAPI.getConversationMessages(conversationData);
+        const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+        
+        // Add a slight delay to show the digging animation
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Call comprehensive analysis that combines everything
+        return await OpenAIAPI.comprehensiveProspectAnalysis(conversationText);
+      }, 'Gold Digging Analysis');
       
-      // Add a slight delay to show the digging animation
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Call comprehensive analysis that combines everything
-      const goldStrike = await OpenAIAPI.comprehensiveProspectAnalysis(conversationText);
       setAnalysis(goldStrike);
       
       // Show success animation briefly
@@ -370,7 +433,22 @@ function App() {
               <li>Missive Script: {typeof window.Missive !== 'undefined' ? '✅ Loaded' : '❌ Not loaded'}</li>
               <li>Integration URL: {window.location.href}</li>
               <li>Running in iframe: {window.parent !== window ? '✅ Yes' : '❌ No'}</li>
+              <li>Security Status: {securityStatus?.error ? '❌ Failed' : '✅ Passed'}</li>
             </ul>
+            
+            {securityStatus && (
+              <div>
+                <p><strong>🔒 Security Details:</strong></p>
+                {securityStatus.error ? (
+                  <p style={{color: 'red', fontWeight: 'bold'}}>❌ {securityStatus.error}</p>
+                ) : (
+                  <div style={{color: 'green'}}>
+                    <p>✅ All security checks passed</p>
+                    <p>Rate limit: {securityStatus.rateLimitStatus?.requestsInWindow || 0}/{securityStatus.rateLimitStatus?.maxRequests || 10} requests</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           
           <p><strong>Setup Instructions:</strong></p>
@@ -393,6 +471,11 @@ function App() {
       <div className="sidebar-header">
         <h1>⛏️ Gold Prospector</h1>
         <p>Strike sales gold with AI-powered lead prospecting</p>
+        {securityStatus && !securityStatus.error && (
+          <div className="security-badge">
+            🔒 Secured
+          </div>
+        )}
       </div>
 
       <div className="sidebar-content">
@@ -401,9 +484,46 @@ function App() {
             <p>👈 Select a lead to prospect for gold</p>
             <div className="debug-info-small">
               <details>
-                <summary>Debug Info</summary>
+                <summary>Debug & Security Info</summary>
                 <pre>{debugInfo}</pre>
+                
+                <h4>🔒 Security Status:</h4>
+                {securityStatus ? (
+                  <div className="security-status">
+                    {securityStatus.error ? (
+                      <p style={{color: 'red'}}>❌ {securityStatus.error}</p>
+                    ) : (
+                      <div>
+                        <p style={{color: 'green'}}>✅ Security checks passed</p>
+                        <p>Rate limit: {securityStatus.rateLimitStatus?.requestsInWindow || 0}/{securityStatus.rateLimitStatus?.maxRequests || 10}</p>
+                        {securityStatus.rateLimitStatus?.blockedUntil && (
+                          <p style={{color: 'orange'}}>⚠️ Rate limited until {new Date(securityStatus.rateLimitStatus.blockedUntil).toLocaleTimeString()}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p>⏳ Checking security status...</p>
+                )}
               </details>
+            </div>
+          </div>
+        ) : error && error.includes('Security Error') ? (
+          <div className="security-error">
+            <h3>🔒 Access Denied</h3>
+            <p>This integration is secured and can only be used within Missive.</p>
+            <div className="error-details">
+              <p><strong>Security Check Failed:</strong></p>
+              <p>{error.replace('Security Error: ', '')}</p>
+            </div>
+            <div className="security-help">
+              <p><strong>If you're using this legitimately:</strong></p>
+              <ul>
+                <li>Make sure you're accessing this through Missive's sidebar</li>
+                <li>Clear your browser cache and restart Missive</li>
+                <li>Check that you're using the correct integration URL</li>
+                <li>Contact support if the issue persists</li>
+              </ul>
             </div>
           </div>
         ) : (
