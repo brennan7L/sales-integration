@@ -456,6 +456,19 @@ function App() {
               </div>
             )}
 
+            {/* Dig for Gold button - Top placement on initial page */}
+            {!analysis && !loading && (
+              <div className="action-buttons initial-dig-button">
+                <button 
+                  className="analyze-btn primary gold-strike-btn"
+                  onClick={digForGold}
+                  disabled={loading}
+                >
+                  ⛏️ Dig for Gold!
+                </button>
+              </div>
+            )}
+
             {/* Show WANTED poster when no analysis yet */}
             {!analysis && !loading && (
               <div className="wanted-poster">
@@ -505,33 +518,10 @@ function App() {
               </div>
             )}
 
-            {!analysis && (
+            {/* Loading animations */}
+            {loading && (
               <div className="action-buttons">
-                <button 
-                  className={`analyze-btn primary gold-strike-btn ${loading ? 'mining' : ''} ${digging ? 'digging' : ''}`}
-                  onClick={digForGold}
-                  disabled={loading}
-                >
-                  {loading ? '⛏️ Mining Deep...' : '⛏️ Dig for Gold!'}
-                </button>
-                {loading && (
-                  <div className="mining-animation">
-                    <div className="pickaxe">⛏️</div>
-                    <div className="dirt-particles">
-                      <div className="dirt-particle"></div>
-                      <div className="dirt-particle"></div>
-                      <div className="dirt-particle"></div>
-                      <div className="dirt-particle"></div>
-                      <div className="dirt-particle"></div>
-                      <div className="dirt-particle"></div>
-                    </div>
-                    <div className="mining-text">Prospecting for gold nuggets...</div>
-                  </div>
-                )}
-
-                {/* Enhanced prominent loading animation */}
-                {loading && (
-                  <div className="enhanced-mining-animation">
+                <div className="enhanced-mining-animation">
                     <div className="mining-scene">
                       <div className="mountain">⛰️</div>
                       <div className="prospector">🤠</div>
@@ -587,19 +577,18 @@ function App() {
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
-                {digging && !loading && (
-                  <div className="gold-particles">
-                    <div className="particle"></div>
-                    <div className="particle"></div>
-                    <div className="particle"></div>
-                    <div className="particle"></div>
-                    <div className="particle"></div>
-                  </div>
-                )}
-              </div>
-            )}
+              {digging && !loading && (
+                <div className="gold-particles">
+                  <div className="particle"></div>
+                  <div className="particle"></div>
+                  <div className="particle"></div>
+                  <div className="particle"></div>
+                  <div className="particle"></div>
+                </div>
+              )}
 
             {error && (
               <div className="error-message">

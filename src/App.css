@@ -878,32 +878,138 @@
 
 /* WANTED Poster Styles */
 .wanted-poster {
-  background: linear-gradient(145deg, #f4e4bc 0%, #e6d3a3 100%);
-  border: 3px solid #8b4513;
+  background: 
+    /* Subtle stains and aging spots */
+    radial-gradient(circle at 20% 80%, rgba(139, 69, 19, 0.1) 2px, transparent 2px),
+    radial-gradient(circle at 70% 20%, rgba(160, 82, 45, 0.08) 3px, transparent 3px),
+    radial-gradient(circle at 90% 70%, rgba(101, 67, 33, 0.06) 2px, transparent 2px),
+    radial-gradient(circle at 30% 30%, rgba(139, 69, 19, 0.05) 4px, transparent 4px),
+    /* Paper fiber texture */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(139, 69, 19, 0.02) 2px,
+      rgba(139, 69, 19, 0.02) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(160, 82, 45, 0.015) 2px,
+      rgba(160, 82, 45, 0.015) 4px
+    ),
+    /* Base aged paper color */
+    linear-gradient(135deg, #f4f1e8 0%, #f0ead6 50%, #ede3c8 100%);
+  
+  border: 4px solid #8B4513;
   border-radius: 8px;
-  padding: 20px;
-  margin: 16px 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  font-family: 'Georgia', serif;
+  padding: 25px;
+  margin: 20px 0;
   position: relative;
-  overflow: hidden;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(139, 69, 19, 0.1);
+  
+  /* Tattered edges using clip-path */
+  clip-path: polygon(
+    2% 0%, 
+    8% 2%, 
+    15% 0%, 
+    22% 3%, 
+    30% 1%, 
+    38% 4%, 
+    45% 0%, 
+    52% 2%, 
+    60% 0%, 
+    68% 3%, 
+    75% 1%, 
+    82% 2%, 
+    90% 0%, 
+    95% 3%, 
+    98% 1%, 
+    100% 8%, 
+    98% 15%, 
+    100% 22%, 
+    97% 30%, 
+    99% 38%, 
+    96% 45%, 
+    98% 52%, 
+    100% 60%, 
+    97% 68%, 
+    99% 75%, 
+    98% 82%, 
+    100% 90%, 
+    97% 95%, 
+    99% 98%, 
+    92% 100%, 
+    85% 98%, 
+    78% 100%, 
+    70% 97%, 
+    62% 99%, 
+    55% 96%, 
+    48% 98%, 
+    40% 100%, 
+    32% 97%, 
+    25% 99%, 
+    18% 98%, 
+    10% 100%, 
+    5% 97%, 
+    2% 99%, 
+    0% 92%, 
+    2% 85%, 
+    0% 78%, 
+    3% 70%, 
+    1% 62%, 
+    4% 55%, 
+    2% 48%, 
+    0% 40%, 
+    3% 32%, 
+    1% 25%, 
+    2% 18%, 
+    0% 10%, 
+    3% 5%, 
+    1% 2%
+  );
 }
 
+/* Add torn paper effect around edges */
 .wanted-poster::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: 
+    linear-gradient(45deg, 
+      rgba(139, 69, 19, 0.1) 0%, 
+      transparent 10%, 
+      transparent 90%, 
+      rgba(139, 69, 19, 0.1) 100%
+    );
+  border-radius: 8px;
+  z-index: -1;
+}
+
+/* Add subtle burn marks on edges */
+.wanted-poster::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
-    radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.1) 2px, transparent 2px),
-    radial-gradient(circle at 75% 75%, rgba(139, 69, 19, 0.1) 1px, transparent 1px);
-  background-size: 30px 30px, 20px 20px;
+  background: 
+    radial-gradient(ellipse at top left, rgba(101, 67, 33, 0.2) 0%, transparent 30%),
+    radial-gradient(ellipse at top right, rgba(139, 69, 19, 0.15) 0%, transparent 25%),
+    radial-gradient(ellipse at bottom left, rgba(160, 82, 45, 0.1) 0%, transparent 35%),
+    radial-gradient(ellipse at bottom right, rgba(101, 67, 33, 0.18) 0%, transparent 28%);
+  border-radius: 8px;
   pointer-events: none;
 }
 
-.wanted-header {
+.wanted-poster .wanted-header {
   text-align: center;
   border-bottom: 2px solid #8b4513;
   padding-bottom: 12px;
@@ -1230,4 +1336,17 @@
   margin-top: 20px;
   padding-top: 16px;
   border-top: 2px solid #f0f0f0;
+}
+
+/* Initial dig button at top */
+.initial-dig-button {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.initial-dig-button .analyze-btn {
+  font-size: 18px;
+  padding: 15px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 } 
