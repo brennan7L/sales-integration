@@ -1124,30 +1124,35 @@
   font-size: 12px;
 }
 
-/* Enhanced Mining Animation */
+/* Enhanced Mining Animation - Responsive and Contained */
 .enhanced-mining-animation {
   background: linear-gradient(135deg, #8b4513 0%, #4a2c17 100%);
-  border-radius: 12px;
-  padding: 24px;
-  margin: 20px 0;
-  border: 3px solid #cd853f;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  border: 2px solid #cd853f;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   color: white;
   position: relative;
   overflow: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .mining-scene {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  margin-bottom: 16px;
   position: relative;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .mountain, .prospector, .main-pickaxe, .mining-cart {
-  font-size: 28px;
+  font-size: 20px;
   animation: bounce 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
 .mountain {
@@ -1169,25 +1174,32 @@
 
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes pickaxeSwing {
+  0%, 100% { transform: rotate(-10deg) translateY(0); }
+  50% { transform: rotate(10deg) translateY(-3px); }
 }
 
 .digging-area {
   position: relative;
-  height: 40px;
-  margin: 16px 0;
+  height: 30px;
+  margin: 12px 0;
+  overflow: hidden;
 }
 
 .ground-particles {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 4px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .ground-particle {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   background: #cd853f;
   border-radius: 50%;
   animation: groundFly 1.5s ease-out infinite;
@@ -1203,16 +1215,16 @@
 .ground-particle:nth-child(8) { animation-delay: 0.7s; }
 
 @keyframes groundFly {
-  0% { 
+  0% {
     transform: translateY(0) scale(1);
     opacity: 1;
   }
   50% {
-    transform: translateY(-20px) scale(1.3);
+    transform: translateY(-12px) scale(0.8);
     opacity: 0.8;
   }
-  100% { 
-    transform: translateY(-35px) scale(0.7);
+  100% {
+    transform: translateY(-20px) scale(0.3);
     opacity: 0;
   }
 }
@@ -1220,12 +1232,13 @@
 .gold-discovery {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .gold-nugget {
-  font-size: 20px;
-  animation: goldGlow 2s ease-in-out infinite alternate;
+  font-size: 14px;
+  animation: goldGlow 2s ease-in-out infinite;
 }
 
 .gold-nugget:nth-child(1) { animation-delay: 0s; }
@@ -1233,40 +1246,43 @@
 .gold-nugget:nth-child(3) { animation-delay: 0.6s; }
 
 @keyframes goldGlow {
-  0% { 
+  0%, 100% {
     transform: scale(1);
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    filter: brightness(1);
   }
-  100% { 
+  50% {
     transform: scale(1.1);
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    filter: brightness(1.5) drop-shadow(0 0 8px gold);
   }
 }
 
 .mining-status h3 {
   text-align: center;
+  margin: 12px 0 8px 0;
+  font-size: 14px;
   color: #ffd700;
-  margin: 0 0 16px 0;
-  font-size: 18px;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .status-bars {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .status-bar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 8px 0;
-  font-size: 13px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  gap: 8px;
 }
 
 .status-bar span {
-  color: #e6d3a3;
+  flex: 1;
+  min-width: 0;
   font-weight: 500;
-  min-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .progress-bar {
@@ -1274,20 +1290,20 @@
   height: 8px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
-  margin-left: 12px;
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
+  min-width: 60px;
 }
 
 .progress-bar::after {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
+  left: -100%;
+  width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
-  border-radius: 4px;
-  animation: progressFill 3s ease-in-out infinite;
+  background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700);
+  animation: progressFill 2s ease-in-out infinite;
 }
 
 .progress-bar.lead-quality::after { animation-delay: 0s; }
@@ -1296,22 +1312,22 @@
 .progress-bar.insights::after { animation-delay: 1.5s; }
 
 @keyframes progressFill {
-  0% { width: 0%; }
-  50% { width: 100%; }
-  100% { width: 100%; }
+  0% { left: -100%; }
+  50%, 100% { left: 0%; }
 }
 
 .mining-quotes {
-  text-align: center;
+  margin-top: 8px;
 }
 
 .mining-quotes p {
-  font-style: italic;
-  color: #d4af37;
-  margin: 4px 0;
-  font-size: 12px;
-  animation: quoteRotate 8s infinite;
+  margin: 0;
+  font-size: 11px;
+  text-align: center;
   opacity: 0;
+  animation: quoteRotate 8s infinite;
+  font-style: italic;
+  color: #ffd700;
 }
 
 .mining-quotes p:nth-child(1) { animation-delay: 0s; }
@@ -1320,9 +1336,43 @@
 .mining-quotes p:nth-child(4) { animation-delay: 6s; }
 
 @keyframes quoteRotate {
-  0%, 25% { opacity: 0; }
-  12.5% { opacity: 1; }
-  100% { opacity: 0; }
+  0%, 20% { opacity: 0; transform: translateY(10px); }
+  25%, 75% { opacity: 1; transform: translateY(0); }
+  80%, 100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Responsive adjustments for narrow sidebars */
+@media (max-width: 300px) {
+  .enhanced-mining-animation {
+    padding: 12px;
+    margin: 12px 0;
+  }
+  
+  .mountain, .prospector, .main-pickaxe, .mining-cart {
+    font-size: 16px;
+  }
+  
+  .mining-status h3 {
+    font-size: 12px;
+  }
+  
+  .status-bar {
+    font-size: 10px;
+    gap: 6px;
+  }
+  
+  .progress-bar {
+    height: 6px;
+    min-width: 40px;
+  }
+  
+  .mining-quotes p {
+    font-size: 10px;
+  }
+  
+  .gold-nugget {
+    font-size: 12px;
+  }
 }
 
 /* Button Placement Styles */
