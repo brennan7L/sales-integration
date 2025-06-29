@@ -255,7 +255,7 @@ function App() {
             <div className="conversation-header">
               <h3>{conversationData.subject || 'No Subject'}</h3>
               <span className="participants">
-                {conversationData.participants?.length || 0} participants
+                {conversationData.authors?.length || conversationData.users?.length || 1} participants
               </span>
             </div>
 
