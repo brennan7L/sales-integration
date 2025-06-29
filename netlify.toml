@@ -15,13 +15,15 @@
   command = "npm run dev"
   port = 8080
 
-# Headers for better security and CORS handling
+# Headers for better security and CORS handling - Allow embedding in Missive
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    # Remove X-Frame-Options to allow iframe embedding
+    # Add CSP to allow framing from Missive domains
+    Content-Security-Policy = "frame-ancestors 'self' https://*.missiveapp.com https://mail.missiveapp.com;"
     
 # Enable gzip compression
 [[headers]]
