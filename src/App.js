@@ -441,6 +441,70 @@ function App() {
               </div>
             )}
 
+            {/* Add to Missive button - Top placement (under scorecard) */}
+            {analysis && (
+              <div className="action-buttons add-to-missive top-placement">
+                <button 
+                  className={`analyze-btn missive-btn ${commentAdded ? 'success' : ''} ${addingComment ? 'loading' : ''}`}
+                  onClick={addToMissive}
+                  disabled={addingComment || commentAdded}
+                >
+                  {addingComment ? '📝 Adding to Missive...' : 
+                   commentAdded ? '✅ Added to Missive!' : 
+                   '📝 Add to Missive'}
+                </button>
+              </div>
+            )}
+
+            {/* Show WANTED poster when no analysis yet */}
+            {!analysis && !loading && (
+              <div className="wanted-poster">
+                <div className="wanted-header">
+                  <h2>WANTED</h2>
+                  <div className="reward">$1,000,000 REWARD</div>
+                </div>
+                
+                <div className="wanted-content">
+                  <div className="suspect-info">
+                    <h3>🏃‍♂️ SUSPECT:</h3>
+                    <p><strong>QUALITY FREIGHT FORWARDING LEADS</strong></p>
+                  </div>
+                  
+                  <div className="crimes">
+                    <h3>⚖️ WANTED FOR:</h3>
+                    <ul>
+                      <li>🎯 <strong>High-Value Prospecting</strong> - Converting into paying customers</li>
+                      <li>💰 <strong>Revenue Generation</strong> - Bringing in serious business</li>
+                      <li>📈 <strong>Business Growth</strong> - Scaling freight forwarding operations</li>
+                      <li>🤝 <strong>Long-Term Partnerships</strong> - Building lasting relationships</li>
+                    </ul>
+                  </div>
+
+                  <div className="description">
+                    <h3>📋 DESCRIPTION:</h3>
+                    <p>The <strong>Gold Prospector</strong> is a legendary AI bounty hunter that can:</p>
+                    <ul>
+                      <li>🔍 <strong>Identify genuine prospects</strong> from fool's gold</li>
+                      <li>⚡ <strong>Analyze lead quality</strong> in seconds</li>
+                      <li>🚨 <strong>Detect red flags</strong> (Gmail addresses, truckers, etc.)</li>
+                      <li>💎 <strong>Uncover hidden opportunities</strong> in conversations</li>
+                      <li>📊 <strong>Provide actionable insights</strong> for closing deals</li>
+                    </ul>
+                  </div>
+
+                  <div className="warning">
+                    <h3>⚠️ WARNING:</h3>
+                    <p>This tool is <strong>EXTREMELY EFFECTIVE</strong> at separating high-value freight forwarders from time-wasters. Use with caution!</p>
+                  </div>
+                </div>
+                
+                <div className="wanted-footer">
+                  <p>🤠 <em>Sheriff's Department of Sales</em></p>
+                  <p><small>⛏️ Click "Dig for Gold" to start the hunt!</small></p>
+                </div>
+              </div>
+            )}
+
             {!analysis && (
               <div className="action-buttons">
                 <button 
@@ -464,6 +528,67 @@ function App() {
                     <div className="mining-text">Prospecting for gold nuggets...</div>
                   </div>
                 )}
+
+                {/* Enhanced prominent loading animation */}
+                {loading && (
+                  <div className="enhanced-mining-animation">
+                    <div className="mining-scene">
+                      <div className="mountain">⛰️</div>
+                      <div className="prospector">🤠</div>
+                      <div className="main-pickaxe">⛏️</div>
+                      <div className="mining-cart">🛒</div>
+                      
+                      <div className="digging-area">
+                        <div className="ground-particles">
+                          <div className="ground-particle"></div>
+                          <div className="ground-particle"></div>
+                          <div className="ground-particle"></div>
+                          <div className="ground-particle"></div>
+                          <div className="ground-particle"></div>
+                          <div className="ground-particle"></div>
+                          <div className="ground-particle"></div>
+                          <div className="ground-particle"></div>
+                        </div>
+                        
+                        <div className="gold-discovery">
+                          <div className="gold-nugget">💰</div>
+                          <div className="gold-nugget">💎</div>
+                          <div className="gold-nugget">🟡</div>
+                        </div>
+                      </div>
+                      
+                      <div className="mining-status">
+                        <h3>🔍 AI PROSPECTOR AT WORK</h3>
+                        <div className="status-bars">
+                          <div className="status-bar">
+                            <span>Analyzing Lead Quality:</span>
+                            <div className="progress-bar lead-quality"></div>
+                          </div>
+                          <div className="status-bar">
+                            <span>Detecting Red Flags:</span>
+                            <div className="progress-bar red-flags"></div>
+                          </div>
+                          <div className="status-bar">
+                            <span>Calculating Gold Potential:</span>
+                            <div className="progress-bar gold-potential"></div>
+                          </div>
+                          <div className="status-bar">
+                            <span>Generating Insights:</span>
+                            <div className="progress-bar insights"></div>
+                          </div>
+                        </div>
+                        
+                        <div className="mining-quotes">
+                          <p>"🕵️‍♂️ Separating gold from fool's gold..."</p>
+                          <p>"🔍 Checking for Gmail red flags..."</p>
+                          <p>"💰 Calculating prospect value..."</p>
+                          <p>"⚖️ Weighing opportunity potential..."</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {digging && !loading && (
                   <div className="gold-particles">
                     <div className="particle"></div>
@@ -501,19 +626,6 @@ function App() {
                     </div>
                   </div>
                 )}
-
-                {/* Add to Missive button after results */}
-                <div className="action-buttons add-to-missive">
-                  <button 
-                    className={`analyze-btn missive-btn ${commentAdded ? 'success' : ''} ${addingComment ? 'loading' : ''}`}
-                    onClick={addToMissive}
-                    disabled={addingComment || commentAdded}
-                  >
-                    {addingComment ? '📝 Adding to Missive...' : 
-                     commentAdded ? '✅ Added to Missive!' : 
-                     '📝 Add to Missive'}
-                  </button>
-                </div>
               </>
             )}
 
@@ -523,6 +635,21 @@ function App() {
                 <div className="analysis-content">
                   {formatAnalysisContent(analysis)}
                 </div>
+              </div>
+            )}
+
+            {/* Add to Missive button - Bottom placement (after all analysis) */}
+            {analysis && (
+              <div className="action-buttons add-to-missive bottom-placement">
+                <button 
+                  className={`analyze-btn missive-btn ${commentAdded ? 'success' : ''} ${addingComment ? 'loading' : ''}`}
+                  onClick={addToMissive}
+                  disabled={addingComment || commentAdded}
+                >
+                  {addingComment ? '📝 Adding to Missive...' : 
+                   commentAdded ? '✅ Added to Missive!' : 
+                   '📝 Add to Missive'}
+                </button>
               </div>
             )}
           </div>
