@@ -112,28 +112,72 @@
   gap: 16px;
 }
 
-.conversation-header {
-  padding: 12px;
-  background: #f3f4f6;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+/* Scorecard */
+.scorecard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 16px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.conversation-header h3 {
-  font-size: 14px;
+.scorecard h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
   font-weight: 600;
-  margin: 0 0 4px 0;
-  color: #111827;
+  color: white;
+}
+
+.scorecard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.scorecard-item {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.scorecard-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.scorecard-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
   word-wrap: break-word;
 }
 
-.participants {
-  font-size: 11px;
-  color: #6b7280;
-  background: #e5e7eb;
-  padding: 2px 6px;
-  border-radius: 10px;
-  display: inline-block;
+/* Special styling for rating scorecard items */
+.scorecard-item.rating.high-fit {
+  background: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.scorecard-item.rating.medium-fit {
+  background: rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.scorecard-item.rating.low-fit {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.scorecard-item.rating.poor-fit {
+  background: rgba(127, 29, 29, 0.3);
+  border-color: rgba(127, 29, 29, 0.5);
 }
 
 /* Action Buttons */
@@ -394,6 +438,32 @@
   
   .debug-info pre {
     font-size: 10px;
+  }
+
+  /* Scorecard responsive design */
+  .scorecard {
+    padding: 12px;
+  }
+
+  .scorecard h4 {
+    font-size: 14px;
+  }
+
+  .scorecard-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .scorecard-item {
+    padding: 8px;
+  }
+
+  .scorecard-label {
+    font-size: 10px;
+  }
+
+  .scorecard-value {
+    font-size: 12px;
   }
 }
 

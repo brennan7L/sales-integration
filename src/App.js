@@ -191,6 +191,47 @@ function App() {
     return 'unknown-fit';
   };
 
+  // Extract key metrics from analysis for scorecard
+  const extractScorecard = (analysisText) => {
+    if (!analysisText) return null;
+
+    const metrics = {};
+    
+    // Extract rating
+    const ratingMatch = analysisText.match(/\*\*RATING:\s*([^*]+)\*\*/i);
+    if (ratingMatch) {
+      metrics.rating = ratingMatch[1].trim();
+    }
+
+    // Extract sentiment
+    const sentimentMatch = analysisText.match(/\*\*SENTIMENT:\s*([^*]+)\*\*/i);
+    if (sentimentMatch) {
+      metrics.sentiment = sentimentMatch[1].trim();
+    } else if (analysisText.toLowerCase().includes('positive')) {
+      metrics.sentiment = 'Positive';
+    } else if (analysisText.toLowerCase().includes('negative')) {
+      metrics.sentiment = 'Negative';
+    } else if (analysisText.toLowerCase().includes('neutral')) {
+      metrics.sentiment = 'Neutral';
+    }
+
+    // Extract opportunity score
+    const opportunityMatch = analysisText.match(/\*\*OPPORTUNITY:\s*([^*]+)\*\*/i);
+    if (opportunityMatch) {
+      metrics.opportunity = opportunityMatch[1].trim();
+    }
+
+    // Extract urgency
+    const urgencyMatch = analysisText.match(/\*\*URGENCY:\s*([^*]+)\*\*/i);
+    if (urgencyMatch) {
+      metrics.urgency = urgencyMatch[1].trim();
+    }
+
+    return Object.keys(metrics).length > 0 ? metrics : null;
+  };
+
+  const scorecard = extractScorecard(analysis);
+
   if (!isMissiveContext) {
     return (
       <div className="app-container">
@@ -252,12 +293,38 @@ function App() {
           </div>
         ) : (
           <div className="conversation-info">
-            <div className="conversation-header">
-              <h3>{conversationData.subject || 'No Subject'}</h3>
-              <span className="participants">
-                {conversationData.authors?.length || conversationData.users?.length || 1} participants
-              </span>
-            </div>
+            {/* Scorecard */}
+            {scorecard && (
+              <div className="scorecard">
+                <h4>📊 Analysis Scorecard</h4>
+                <div className="scorecard-grid">
+                  {scorecard.rating && (
+                    <div className={`scorecard-item rating ${getRatingClass(scorecard.rating)}`}>
+                      <div className="scorecard-label">Lead Rating</div>
+                      <div className="scorecard-value">{scorecard.rating}</div>
+                    </div>
+                  )}
+                  {scorecard.sentiment && (
+                    <div className="scorecard-item sentiment">
+                      <div className="scorecard-label">Sentiment</div>
+                      <div className="scorecard-value">{scorecard.sentiment}</div>
+                    </div>
+                  )}
+                  {scorecard.opportunity && (
+                    <div className="scorecard-item opportunity">
+                      <div className="scorecard-label">Opportunity</div>
+                      <div className="scorecard-value">{scorecard.opportunity}</div>
+                    </div>
+                  )}
+                  {scorecard.urgency && (
+                    <div className="scorecard-item urgency">
+                      <div className="scorecard-label">Urgency</div>
+                      <div className="scorecard-value">{scorecard.urgency}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="action-buttons">
               <button 
