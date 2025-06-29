@@ -23,7 +23,7 @@ function App() {
       // Security validation on startup
       try {
         console.log('🔒 Running initial security validation...');
-        await SecurityManager.validateAccess();
+        await SecurityManager.validateAccess(null);
         console.log('✅ Initial security validation passed including organization check');
         
         // Get security status for debugging
@@ -74,7 +74,7 @@ function App() {
     try {
       // Validate security before each API call
       console.log(`🔒 Validating security for ${functionName}...`);
-      await SecurityManager.validateAccess();
+      await SecurityManager.validateAccess(conversationData);
       console.log(`✅ Security validation passed for ${functionName}`);
       
       // Update security status

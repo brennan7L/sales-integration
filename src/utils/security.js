@@ -8,7 +8,7 @@ class SecurityValidator {
   }
 
   // Main security validation - checks all security measures
-  async validateAccess() {
+  async validateAccess(conversationData = null) {
     console.log('🔒 SecurityManager: Running security validation...');
     
     const checks = {
@@ -39,7 +39,7 @@ class SecurityValidator {
     if (checks.context.passed && typeof window.Missive !== 'undefined') {
       try {
         console.log('🔒 Running organization validation...');
-        const orgCheck = await this.validateOrganization();
+        const orgCheck = await this.validateOrganization(conversationData);
         checks.organization = orgCheck;
         
         console.log('🔒 Organization check result:', orgCheck);
@@ -302,7 +302,7 @@ class SecurityValidator {
   }
 
   // Validate organization using hashed comparison
-  async validateOrganization() {
+  async validateOrganization(conversationData = null) {
     // Hashed version of authorized organization ID
     const AUTHORIZED_ORG_HASH = '348387cf'; // This is the hash of your org ID
     
@@ -313,55 +313,34 @@ class SecurityValidator {
     const simpleHash = this.simpleHash.bind(this);
     
     try {
-      // First, try direct approach using current conversations
-      const directCheck = async () => {
-        try {
-          console.log('🔒 Attempting direct organization check...');
-          const conversations = await window.Missive.fetchConversations();
-          console.log('🔒 Direct check - Retrieved conversations:', conversations);
-          
-          if (conversations && conversations.length > 0) {
-            const conversation = conversations[0];
-            console.log('🔒 Direct check - Conversation org:', conversation.organization);
-            
-            if (conversation.organization && conversation.organization.id) {
-              const orgId = conversation.organization.id;
-              const currentOrgHash = simpleHash(orgId);
-              
-              console.log('🔒 Direct check - Organization ID:', orgId);
-              console.log('🔒 Direct check - Computed hash:', currentOrgHash);
-              console.log('🔒 Direct check - Expected hash:', AUTHORIZED_ORG_HASH);
-              console.log('🔒 Direct check - Hash match:', currentOrgHash === AUTHORIZED_ORG_HASH);
-              
-              if (currentOrgHash === AUTHORIZED_ORG_HASH) {
-                console.log('✅ Direct organization validation PASSED');
-                return {
-                  passed: true,
-                  reason: `Organization verified: ${conversation.organization.name || 'Unknown'}`
-                };
-              } else {
-                console.log('🚨 Direct organization validation FAILED - hash mismatch');
-                return {
-                  passed: false,
-                  reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
-                };
-              }
-            }
-          }
-        } catch (error) {
-          console.log('⚠️ Direct organization check failed:', error);
+      // First, try using conversation data if provided (from app context)
+      if (conversationData && conversationData.organization && conversationData.organization.id) {
+        console.log('🔒 Using provided conversation data for org validation');
+        const orgId = conversationData.organization.id;
+        const currentOrgHash = simpleHash(orgId);
+        
+        console.log('🔒 Context check - Organization ID:', orgId);
+        console.log('🔒 Context check - Computed hash:', currentOrgHash);
+        console.log('🔒 Context check - Expected hash:', AUTHORIZED_ORG_HASH);
+        console.log('🔒 Context check - Hash match:', currentOrgHash === AUTHORIZED_ORG_HASH);
+        
+        if (currentOrgHash === AUTHORIZED_ORG_HASH) {
+          console.log('✅ Context organization validation PASSED');
+          return {
+            passed: true,
+            reason: `Organization verified: ${conversationData.organization.name || 'Unknown'}`
+          };
+        } else {
+          console.log('🚨 Context organization validation FAILED - hash mismatch');
+          return {
+            passed: false,
+            reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
+          };
         }
-        return null; // Indicates we need to try the listener approach
-      };
-
-      // Try direct check first
-      const directResult = await directCheck();
-      if (directResult) {
-        return directResult;
       }
 
-      // Fallback to listener approach if direct check didn't work
-      console.log('🔒 Direct check failed, using listener approach...');
+      // Fallback to listener approach if no conversation data provided
+      console.log('🔒 No conversation data provided, using listener approach...');
       
       return new Promise((resolve) => {
         let cleanup = () => {}; // Default no-op cleanup
