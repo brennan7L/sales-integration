@@ -195,20 +195,30 @@ IDEAL CUSTOMER PROFILE (Your "Gold Mine"):
 - Companies lacking proper certifications
 - Outside North America
 
-FORMAT YOUR PROSPECTOR'S REPORT EXACTLY LIKE THIS:
+FORMAT YOUR COMPREHENSIVE ANALYSIS EXACTLY LIKE THIS:
+
+## 🏆 PROSPECTOR SCORECARD
 
 **⭐ PROSPECT RATING: [GOLD STRIKE! / SILVER NUGGET / COPPER FIND / FOOL'S GOLD]**
+
+**💰 OPPORTUNITY SCORE: [HIGH / MEDIUM / LOW]**
+
+**😊 SENTIMENT: [POSITIVE / NEUTRAL / NEGATIVE]** 
+
+**⚡ URGENCY: [IMMEDIATE / SOON / LONG-TERM / UNKNOWN]**
+
+## ⛏️ PROSPECTOR REPORT
 
 **🔍 PROSPECT PROFILE:**
 [2-3 sentences about who they are and what they do]
 
-**💰 OPPORTUNITY ASSESSMENT:**
+**💎 OPPORTUNITY ASSESSMENT:**
 [Analyze the sales potential - volume, growth signs, budget indicators]
 
-**😊 SENTIMENT & RELATIONSHIP:**
+**🤝 SENTIMENT & RELATIONSHIP:**
 [How they feel about their current situation and their attitude toward change]
 
-**⚡ URGENCY SIGNALS:**
+**⏰ URGENCY SIGNALS:**
 [Timeline pressures, pain points driving immediate need]
 
 **🎯 GOLD NUGGETS (Key Selling Points):**
@@ -224,12 +234,32 @@ FORMAT YOUR PROSPECTOR'S REPORT EXACTLY LIKE THIS:
 **🚨 POTENTIAL HAZARDS:**
 [Any red flags, competitor threats, or deal risks to watch out for]
 
-RATING GUIDE:
-- GOLD STRIKE!: Perfect fit, strong buying signals, high value
-- SILVER NUGGET: Good potential, worth significant investment
-- COPPER FIND: Some promise, investigate further
-- FOOL'S GOLD: Poor fit, minimal investment warranted
+## 🏢 COMPANY INTELLIGENCE
 
-Write like an experienced prospector who knows how to spot real treasure! Use confident, action-oriented language that gets salespeople excited to strike gold! 🏆`;
+**📋 COMPANY OVERVIEW:**
+[Based on available information, provide comprehensive company analysis including business model, size indicators, market position]
+
+**🎯 BUSINESS FOCUS:**
+[Primary services, target markets, specializations, geographic coverage]
+
+**📈 GROWTH INDICATORS:**
+[Signs of growth, expansion, hiring, new locations, technology adoption]
+
+**🔍 COMPETITIVE LANDSCAPE:**
+[Current solutions they might be using, competitors they've mentioned, market position]
+
+**💡 STRATEGIC INSIGHTS:**
+[Key business challenges they face, market trends affecting them, opportunities for our solution]
+
+**🎪 DECISION-MAKING PROFILE:**
+[Who makes decisions, buying process indicators, budget authority signs]
+
+RATING GUIDE:
+- GOLD STRIKE!: Perfect fit, strong buying signals, high value, immediate opportunity
+- SILVER NUGGET: Good potential, multiple positive indicators, worth significant investment  
+- COPPER FIND: Some promise, needs investigation, moderate potential
+- FOOL'S GOLD: Poor fit, major red flags, minimal investment warranted
+
+Write like an experienced prospector who knows how to spot real treasure! Use confident, action-oriented language that gets salespeople excited to dig for gold! 🏆`;
   }
 } 
