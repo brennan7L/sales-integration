@@ -303,6 +303,16 @@ function App() {
   const scorecard = extractScorecard(analysis);
   const analysisSections = extractAnalysisSections(analysis);
 
+  // Get dynamic scorecard class based on rating
+  const getScorecardClass = (rating) => {
+    if (!rating) return 'scorecard-default';
+    if (rating.includes('GOLD STRIKE')) return 'scorecard-gold';
+    if (rating.includes('SILVER NUGGET')) return 'scorecard-silver';
+    if (rating.includes('COPPER FIND')) return 'scorecard-copper';
+    if (rating.includes('FOOL\'S GOLD')) return 'scorecard-fools-gold';
+    return 'scorecard-default';
+  };
+
   if (!isMissiveContext) {
     return (
       <div className="app-container">
@@ -366,7 +376,7 @@ function App() {
           <div className="conversation-info">
             {/* Scorecard */}
             {scorecard && (
-              <div className="scorecard">
+              <div className={`scorecard ${getScorecardClass(scorecard.rating)}`}>
                 <h4>🏆 Prospector's Scorecard</h4>
                 <div className="scorecard-grid">
                   {scorecard.rating && (
@@ -399,12 +409,26 @@ function App() {
 
             <div className="action-buttons">
               <button 
-                className={`analyze-btn primary gold-strike-btn ${digging ? 'digging' : ''}`}
+                className={`analyze-btn primary gold-strike-btn ${loading ? 'mining' : ''} ${digging ? 'digging' : ''}`}
                 onClick={digForGold}
                 disabled={loading}
               >
-                {loading ? '⛏️ Digging for Gold...' : '⛏️ Dig for Gold!'}
+                {loading ? '⛏️ Mining Deep...' : '⛏️ Dig for Gold!'}
               </button>
+              {loading && (
+                <div className="mining-animation">
+                  <div className="pickaxe">⛏️</div>
+                  <div className="dirt-particles">
+                    <div className="dirt-particle"></div>
+                    <div className="dirt-particle"></div>
+                    <div className="dirt-particle"></div>
+                    <div className="dirt-particle"></div>
+                    <div className="dirt-particle"></div>
+                    <div className="dirt-particle"></div>
+                  </div>
+                  <div className="mining-text">Prospecting for gold nuggets...</div>
+                </div>
+              )}
               {digging && !loading && (
                 <div className="gold-particles">
                   <div className="particle"></div>
@@ -441,6 +465,17 @@ function App() {
                     </div>
                   </div>
                 )}
+
+                {/* Re-analysis button after results */}
+                <div className="action-buttons re-analyze">
+                  <button 
+                    className={`analyze-btn secondary gold-strike-btn ${loading ? 'mining' : ''} ${digging ? 'digging' : ''}`}
+                    onClick={digForGold}
+                    disabled={loading}
+                  >
+                    {loading ? '⛏️ Mining Deep...' : '⛏️ Dig Again!'}
+                  </button>
+                </div>
               </>
             )}
 
