@@ -1,18 +1,218 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { MissiveAPI } from './utils/missiveApi';
+import { OpenAIAPI } from './utils/openaiApi';
+import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header>
-        <h1>Sales Integration</h1>
-        <p>Customer service tool that integrates Missive email data with Zoho CRM sales insights</p>
-      </header>
-      <main>
-        <div>
-          <h2>Getting Started</h2>
-          <p>Your sales integration application is ready for development!</p>
+  const [conversationData, setConversationData] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Check if we're running inside Missive
+  const isMissiveContext = MissiveAPI.checkAvailability();
+
+  useEffect(() => {
+    if (!isMissiveContext) return;
+
+    // Set up Missive API event listener
+    const cleanup = MissiveAPI.addEventListener('conversation_selected', handleConversationChange);
+    
+    // Get initial conversation if one is selected
+    MissiveAPI.getSelectedConversation()
+      .then(conversation => {
+        if (conversation) {
+          handleConversationChange(conversation);
+        }
+      })
+      .catch(err => console.log('No conversation selected initially'));
+
+    return cleanup;
+  }, [isMissiveContext]);
+
+  const handleConversationChange = async (conversation) => {
+    if (!conversation) {
+      setConversationData(null);
+      setAnalysis(null);
+      return;
+    }
+
+    setConversationData(conversation);
+    setAnalysis(null);
+    setError(null);
+  };
+
+  const analyzeConversation = async () => {
+    if (!conversationData) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Get conversation messages
+      const messages = await MissiveAPI.getConversationMessages(conversationData.id);
+      
+      // Format messages for analysis
+      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+      
+      // Call OpenAI API
+      const analysis = await OpenAIAPI.analyzeSalesConversation(conversationText);
+      setAnalysis(analysis);
+    } catch (err) {
+      setError(err.message || 'Failed to analyze conversation');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const quickSentiment = async () => {
+    if (!conversationData) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const messages = await MissiveAPI.getConversationMessages(conversationData.id);
+      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+      const sentiment = await OpenAIAPI.quickSentimentAnalysis(conversationText);
+      setAnalysis(sentiment);
+    } catch (err) {
+      setError(err.message || 'Failed to analyze sentiment');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const quickActions = async () => {
+    if (!conversationData) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const messages = await MissiveAPI.getConversationMessages(conversationData.id);
+      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+      const actionItems = await OpenAIAPI.quickActionItems(conversationText);
+      setAnalysis(actionItems);
+    } catch (err) {
+      setError(err.message || 'Failed to extract action items');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatAnalysisContent = (text) => {
+    if (!text) return [];
+    
+    return text.split('\n').map((line, index) => {
+      // Check if line is a section header (starts with ** and ends with **)
+      if (line.match(/^\*\*.*\*\*$/)) {
+        return (
+          <h5 key={index} className="analysis-section-header">
+            {line.replace(/\*\*/g, '')}
+          </h5>
+        );
+      }
+      
+      // Regular line
+      if (line.trim()) {
+        return <p key={index}>{line}</p>;
+      }
+      
+      return null;
+    }).filter(Boolean);
+  };
+
+  if (!isMissiveContext) {
+    return (
+      <div className="app-container">
+        <div className="setup-message">
+          <h2>🚀 Missive Sales Assistant</h2>
+          <p>This app is designed to run as a Missive sidebar integration.</p>
+          <p><strong>Setup Instructions:</strong></p>
+          <ol>
+            <li>Deploy this app to Netlify</li>
+            <li>In Netlify dashboard, go to <strong>Site settings → Environment variables</strong></li>
+            <li>Add environment variable: <code>openAIKey</code> = your OpenAI API key</li>
+            <li>In Missive, go to <strong>Settings → Integrations → Add Integration</strong></li>
+            <li>Choose <strong>iFrame</strong> and enter your Netlify URL</li>
+            <li>Set integration to appear in sidebar</li>
+          </ol>
+          <p>📧 Your AI-powered sales insights will be ready to use!</p>
         </div>
-      </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-container">
+      <div className="sidebar-header">
+        <h1>Sales Assistant</h1>
+        <p>AI-powered conversation analysis</p>
+      </div>
+
+      <div className="sidebar-content">
+        {!conversationData ? (
+          <div className="no-conversation">
+            <p>👈 Select a conversation to analyze</p>
+          </div>
+        ) : (
+          <div className="conversation-info">
+            <div className="conversation-header">
+              <h3>{conversationData.subject || 'No Subject'}</h3>
+              <span className="participants">
+                {conversationData.participants?.length || 0} participants
+              </span>
+            </div>
+
+            <div className="action-buttons">
+              <button 
+                className="analyze-btn primary"
+                onClick={analyzeConversation}
+                disabled={loading}
+              >
+                {loading ? 'Analyzing...' : '🤖 Full Analysis'}
+              </button>
+              
+              <div className="quick-actions">
+                <button 
+                  className="analyze-btn secondary"
+                  onClick={quickSentiment}
+                  disabled={loading}
+                >
+                  😊 Sentiment
+                </button>
+                <button 
+                  className="analyze-btn secondary"
+                  onClick={quickActions}
+                  disabled={loading}
+                >
+                  📋 Actions
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="error-message">
+                <p>❌ {error}</p>
+              </div>
+            )}
+
+            {analysis && (
+              <div className="analysis-results">
+                <h4>📊 Analysis Results</h4>
+                <div className="analysis-content">
+                  {formatAnalysisContent(analysis)}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="sidebar-footer">
+        <small>Powered by OpenAI GPT-4</small>
+      </div>
     </div>
   );
 }

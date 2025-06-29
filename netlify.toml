@@ -4,6 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # The openAIKey environment variable set in Netlify UI will be available to webpack
 
 [[redirects]]
   from = "/*"
@@ -12,4 +13,23 @@
 
 [dev]
   command = "npm run dev"
-  port = 8080 
+  port = 8080
+
+# Headers for better security and CORS handling
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+# Enable gzip compression
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable" 
