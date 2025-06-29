@@ -306,67 +306,163 @@ class SecurityValidator {
     // Hashed version of authorized organization ID
     const AUTHORIZED_ORG_HASH = '348387cf'; // This is the hash of your org ID
     
+    console.log('🔒 Starting organization validation...');
+    console.log('🔒 Expected hash:', AUTHORIZED_ORG_HASH);
+    
+    // Store reference to hash function for use in callbacks
+    const simpleHash = this.simpleHash.bind(this);
+    
     try {
       // Simple approach - try to get organization from conversation data
       return new Promise((resolve) => {
         let cleanup = () => {}; // Default no-op cleanup
+        let validationCompleted = false;
         
         const timeout = setTimeout(() => {
-          if (typeof cleanup === 'function') {
-            cleanup();
+          if (!validationCompleted) {
+            validationCompleted = true;
+            console.log('⏰ Organization validation timeout reached');
+            if (typeof cleanup === 'function') {
+              cleanup();
+            }
+            resolve({
+              passed: false,
+              reason: 'Organization validation timeout - unable to verify organization'
+            });
           }
-          resolve({
-            passed: false,
-            reason: 'Organization validation timeout - unable to verify organization'
-          });
         }, 3000);
 
         // Listen for conversation changes to get organization info        
         try {
+          console.log('🔒 Setting up conversation listener for organization validation...');
+          
           const listener = window.Missive.on('change:conversations', async (conversationIds) => {
             try {
+              console.log('🔒 Conversation change detected for org validation:', conversationIds);
+              
               if (conversationIds && conversationIds.length > 0) {
+                console.log('🔒 Fetching conversations for org validation...');
                 const conversations = await window.Missive.fetchConversations(conversationIds);
+                console.log('🔒 Retrieved conversations:', conversations);
                 
                 if (conversations && conversations.length > 0) {
                   const conversation = conversations[0];
+                  console.log('🔒 Checking conversation organization:', conversation.organization);
+                  
                   if (conversation.organization && conversation.organization.id) {
-                    const currentOrgHash = this.simpleHash(conversation.organization.id);
+                    const orgId = conversation.organization.id;
+                    const currentOrgHash = simpleHash(orgId);
                     
-                    clearTimeout(timeout);
-                    if (typeof cleanup === 'function') {
-                      cleanup();
-                    }
+                    console.log('🔒 Organization ID found:', orgId);
+                    console.log('🔒 Computed hash:', currentOrgHash);
+                    console.log('🔒 Expected hash:', AUTHORIZED_ORG_HASH);
+                    console.log('🔒 Hash match:', currentOrgHash === AUTHORIZED_ORG_HASH);
                     
-                    if (currentOrgHash === AUTHORIZED_ORG_HASH) {
-                      resolve({
-                        passed: true,
-                        reason: `Organization verified: ${conversation.organization.name || 'Unknown'}`
-                      });
-                    } else {
-                      resolve({
-                        passed: false,
-                        reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
-                      });
+                    if (!validationCompleted) {
+                      validationCompleted = true;
+                      clearTimeout(timeout);
+                      if (typeof cleanup === 'function') {
+                        cleanup();
+                      }
+                      
+                      if (currentOrgHash === AUTHORIZED_ORG_HASH) {
+                        console.log('✅ Organization validation PASSED');
+                        resolve({
+                          passed: true,
+                          reason: `Organization verified: ${conversation.organization.name || 'Unknown'}`
+                        });
+                      } else {
+                        console.log('🚨 Organization validation FAILED - hash mismatch');
+                        resolve({
+                          passed: false,
+                          reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
+                        });
+                      }
+                      return;
                     }
-                    return;
+                  } else {
+                    console.log('⚠️ No organization data found in conversation');
                   }
+                } else {
+                  console.log('⚠️ No conversations retrieved');
                 }
+              } else {
+                console.log('⚠️ No conversation IDs provided');
               }
             } catch (error) {
-              console.warn('Organization validation error:', error);
+              console.error('❌ Organization validation error:', error);
             }
           });
           
           // Handle cleanup - some APIs return cleanup function, others don't
           if (typeof listener === 'function') {
             cleanup = listener;
+            console.log('🔒 Organization validation listener setup complete');
+          } else {
+            console.log('⚠️ Listener did not return cleanup function');
           }
+          
+          // Try to immediately check current conversations as fallback
+          console.log('🔒 Attempting immediate organization check...');
+          setTimeout(() => {
+            if (!validationCompleted) {
+              console.log('🔒 Checking for existing conversations...');
+              // Trigger the validation with an empty array to see if there are current conversations
+              window.Missive.fetchConversations([]).then(conversations => {
+                if (conversations && conversations.length > 0) {
+                  console.log('🔒 Found existing conversations, triggering validation...');
+                  // Manually trigger the validation logic
+                  const conversation = conversations[0];
+                  if (conversation.organization && conversation.organization.id) {
+                    const orgId = conversation.organization.id;
+                    const currentOrgHash = simpleHash(orgId);
+                    
+                    console.log('🔒 Immediate check - Organization ID:', orgId);
+                    console.log('🔒 Immediate check - Computed hash:', currentOrgHash);
+                    console.log('🔒 Immediate check - Expected hash:', AUTHORIZED_ORG_HASH);
+                    console.log('🔒 Immediate check - Hash match:', currentOrgHash === AUTHORIZED_ORG_HASH);
+                    
+                    if (!validationCompleted) {
+                      validationCompleted = true;
+                      clearTimeout(timeout);
+                      if (typeof cleanup === 'function') {
+                        cleanup();
+                      }
+                      
+                      if (currentOrgHash === AUTHORIZED_ORG_HASH) {
+                        console.log('✅ Immediate organization validation PASSED');
+                        resolve({
+                          passed: true,
+                          reason: `Organization verified (immediate): ${conversation.organization.name || 'Unknown'}`
+                        });
+                      } else {
+                        console.log('🚨 Immediate organization validation FAILED - hash mismatch');
+                        resolve({
+                          passed: false,
+                          reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
+                        });
+                      }
+                    }
+                  }
+                }
+              }).catch(err => {
+                console.log('⚠️ Immediate conversation check failed:', err);
+              });
+            }
+          }, 100); // Small delay to let things initialize
         } catch (error) {
-          console.warn('Failed to set up organization validation listener:', error);
+          console.error('❌ Failed to set up organization validation listener:', error);
+          if (!validationCompleted) {
+            validationCompleted = true;
+            resolve({
+              passed: false,
+              reason: `Failed to set up organization validation: ${error.message}`
+            });
+          }
         }
       });
     } catch (error) {
+      console.error('❌ Organization validation setup failed:', error);
       return {
         passed: false,
         reason: `Organization validation failed: ${error.message}`
@@ -420,7 +516,14 @@ class SecurityValidator {
           blockedUntil: this.blockedUntil,
           windowDuration: this.rateLimitWindow
         },
-        lastChecks: this.validateAccess()
+        basicChecks: {
+          frameOrigin: this.validateFrameOrigin(),
+          userAgent: this.validateUserAgent(),
+          rateLimit: this.checkRateLimit(),
+          referrer: this.validateReferrer(),
+          context: this.validateMissiveContext()
+        },
+        organizationValidation: 'async - check console logs for details'
       };
     } catch (error) {
       return {
