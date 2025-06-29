@@ -31,29 +31,28 @@ function App() {
 
     if (!isMissiveContext) return;
 
-    // Set up Missive API event listener
-    const cleanup = MissiveAPI.addEventListener('conversation_selected', handleConversationChange);
-    
-    // Get initial conversation if one is selected
-    MissiveAPI.getSelectedConversation()
-      .then(conversation => {
-        console.log('🔍 Initial conversation:', conversation);
-        if (conversation) {
-          handleConversationChange(conversation);
-        }
-      })
-      .catch(err => console.log('No conversation selected initially:', err));
+    console.log('🔗 Setting up Missive conversation listener...');
 
+    // Set up Missive API event listener for conversation changes
+    const cleanup = MissiveAPI.onConversationChange(handleConversationChange);
+    
     return cleanup;
   }, [isMissiveContext]);
 
   const handleConversationChange = async (conversation) => {
-    console.log('🔄 Conversation changed:', conversation);
+    console.log('🔄 App received conversation change:', conversation);
     if (!conversation) {
+      console.log('📭 No conversation selected, clearing data');
       setConversationData(null);
       setAnalysis(null);
       return;
     }
+
+    console.log('📨 New conversation selected:', {
+      id: conversation.id,
+      subject: conversation.subject,
+      messageCount: conversation.messages_count
+    });
 
     setConversationData(conversation);
     setAnalysis(null);
@@ -67,16 +66,21 @@ function App() {
     setError(null);
 
     try {
-      // Get conversation messages
-      const messages = await MissiveAPI.getConversationMessages(conversationData.id);
+      console.log('🔍 Starting full analysis for conversation:', conversationData.id);
+      
+      // Get conversation messages using the updated API
+      const messages = await MissiveAPI.getConversationMessages(conversationData);
+      console.log('📨 Retrieved messages:', messages.length);
       
       // Format messages for analysis
       const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+      console.log('📝 Formatted conversation text length:', conversationText.length);
       
       // Call OpenAI API
       const analysis = await OpenAIAPI.analyzeSalesConversation(conversationText);
       setAnalysis(analysis);
     } catch (err) {
+      console.error('❌ Analysis error:', err);
       setError(err.message || 'Failed to analyze conversation');
     } finally {
       setLoading(false);
@@ -90,11 +94,14 @@ function App() {
     setError(null);
 
     try {
-      const messages = await MissiveAPI.getConversationMessages(conversationData.id);
+      console.log('🚛 Starting freight lead qualification for:', conversationData.id);
+      
+      const messages = await MissiveAPI.getConversationMessages(conversationData);
       const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
       const qualification = await OpenAIAPI.qualifyFreightForwardingLead(conversationText);
       setAnalysis(qualification);
     } catch (err) {
+      console.error('❌ Freight qualification error:', err);
       setError(err.message || 'Failed to qualify lead');
     } finally {
       setLoading(false);
@@ -108,11 +115,14 @@ function App() {
     setError(null);
 
     try {
-      const messages = await MissiveAPI.getConversationMessages(conversationData.id);
+      console.log('😊 Starting sentiment analysis for:', conversationData.id);
+      
+      const messages = await MissiveAPI.getConversationMessages(conversationData);
       const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
       const sentiment = await OpenAIAPI.quickSentimentAnalysis(conversationText);
       setAnalysis(sentiment);
     } catch (err) {
+      console.error('❌ Sentiment analysis error:', err);
       setError(err.message || 'Failed to analyze sentiment');
     } finally {
       setLoading(false);
@@ -126,11 +136,14 @@ function App() {
     setError(null);
 
     try {
-      const messages = await MissiveAPI.getConversationMessages(conversationData.id);
+      console.log('📋 Extracting action items for:', conversationData.id);
+      
+      const messages = await MissiveAPI.getConversationMessages(conversationData);
       const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
       const actionItems = await OpenAIAPI.quickActionItems(conversationText);
       setAnalysis(actionItems);
     } catch (err) {
+      console.error('❌ Action items error:', err);
       setError(err.message || 'Failed to extract action items');
     } finally {
       setLoading(false);
@@ -190,9 +203,17 @@ function App() {
             <pre>{debugInfo}</pre>
             <p><strong>If you're seeing this in Missive:</strong></p>
             <ul>
+              <li>Make sure you're using the correct integration URL: <code>https://salesintegration.netlify.app/</code></li>
               <li>Clear browser cache and restart Missive</li>
-              <li>Check browser console for errors</li>
-              <li>Try adding <code>?v=3</code> to the integration URL</li>
+              <li>Check browser console for errors (F12)</li>
+              <li>Verify the Missive JavaScript API is loading</li>
+            </ul>
+            
+            <p><strong>Technical Status:</strong></p>
+            <ul>
+              <li>Missive Script: {typeof window.Missive !== 'undefined' ? '✅ Loaded' : '❌ Not loaded'}</li>
+              <li>Integration URL: {window.location.href}</li>
+              <li>Running in iframe: {window.parent !== window ? '✅ Yes' : '❌ No'}</li>
             </ul>
           </div>
           
