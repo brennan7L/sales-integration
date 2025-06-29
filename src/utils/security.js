@@ -8,7 +8,7 @@ class SecurityValidator {
   }
 
   // Main security validation - checks all security measures
-  validateAccess() {
+  async validateAccess() {
     console.log('🔒 SecurityManager: Running security validation...');
     
     const checks = {
@@ -19,25 +19,57 @@ class SecurityValidator {
       context: this.validateMissiveContext()
     };
 
-    console.log('🔒 Security checks:', checks);
+    console.log('🔒 Basic security checks:', checks);
 
-    // Log security attempt
-    this.logSecurityAttempt(checks);
+    // All basic checks must pass first
+    const basicPassed = Object.values(checks).every(check => check.passed);
 
-    // All checks must pass
-    const allPassed = Object.values(checks).every(check => check.passed);
-
-    if (!allPassed) {
+    if (!basicPassed) {
       const failedChecks = Object.entries(checks)
         .filter(([_, check]) => !check.passed)
         .map(([name, check]) => `${name}: ${check.reason}`)
         .join(', ');
       
-      console.error('🚨 Security validation failed:', failedChecks);
+      console.error('🚨 Basic security validation failed:', failedChecks);
+      this.logSecurityAttempt(checks);
       throw new Error(`Access denied. Security validation failed: ${failedChecks}`);
     }
 
-    console.log('✅ Security validation passed');
+    // Try organization validation if Missive context is available
+    if (checks.context.passed && typeof window.Missive !== 'undefined') {
+      try {
+        console.log('🔒 Running organization validation...');
+        const orgCheck = await this.validateOrganization();
+        checks.organization = orgCheck;
+        
+        console.log('🔒 Organization check result:', orgCheck);
+        
+        if (!orgCheck.passed) {
+          console.error('🚨 Organization validation failed:', orgCheck.reason);
+          this.logSecurityAttempt(checks);
+          throw new Error(`Access denied. ${orgCheck.reason}`);
+        }
+      } catch (error) {
+        const orgError = {
+          passed: false,
+          reason: `Organization validation error: ${error.message}`
+        };
+        
+        checks.organization = orgError;
+        console.error('🚨 Organization validation error:', error);
+        this.logSecurityAttempt(checks);
+        throw new Error(`Access denied. ${orgError.reason}`);
+      }
+    } else {
+      checks.organization = {
+        passed: true,
+        reason: 'Organization validation skipped (Missive context not available)'
+      };
+    }
+
+    console.log('🔒 All security checks:', checks);
+    this.logSecurityAttempt(checks);
+    console.log('✅ Security validation passed including organization check');
     return true;
   }
 
@@ -229,6 +261,17 @@ class SecurityValidator {
     };
   }
 
+  // Simple hash function for organization validation
+  simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(16);
+  }
+
   // Validate Missive context (API availability)
   validateMissiveContext() {
     // Check if Missive API is available
@@ -256,6 +299,79 @@ class SecurityValidator {
       passed: true,
       reason: 'Valid Missive context'
     };
+  }
+
+  // Validate organization using hashed comparison
+  async validateOrganization() {
+    // Hashed version of authorized organization ID
+    const AUTHORIZED_ORG_HASH = '348387cf'; // This is the hash of your org ID
+    
+    try {
+      // Simple approach - try to get organization from conversation data
+      return new Promise((resolve) => {
+        let cleanup = () => {}; // Default no-op cleanup
+        
+        const timeout = setTimeout(() => {
+          if (typeof cleanup === 'function') {
+            cleanup();
+          }
+          resolve({
+            passed: false,
+            reason: 'Organization validation timeout - unable to verify organization'
+          });
+        }, 3000);
+
+        // Listen for conversation changes to get organization info        
+        try {
+          const listener = window.Missive.on('change:conversations', async (conversationIds) => {
+            try {
+              if (conversationIds && conversationIds.length > 0) {
+                const conversations = await window.Missive.fetchConversations(conversationIds);
+                
+                if (conversations && conversations.length > 0) {
+                  const conversation = conversations[0];
+                  if (conversation.organization && conversation.organization.id) {
+                    const currentOrgHash = this.simpleHash(conversation.organization.id);
+                    
+                    clearTimeout(timeout);
+                    if (typeof cleanup === 'function') {
+                      cleanup();
+                    }
+                    
+                    if (currentOrgHash === AUTHORIZED_ORG_HASH) {
+                      resolve({
+                        passed: true,
+                        reason: `Organization verified: ${conversation.organization.name || 'Unknown'}`
+                      });
+                    } else {
+                      resolve({
+                        passed: false,
+                        reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
+                      });
+                    }
+                    return;
+                  }
+                }
+              }
+            } catch (error) {
+              console.warn('Organization validation error:', error);
+            }
+          });
+          
+          // Handle cleanup - some APIs return cleanup function, others don't
+          if (typeof listener === 'function') {
+            cleanup = listener;
+          }
+        } catch (error) {
+          console.warn('Failed to set up organization validation listener:', error);
+        }
+      });
+    } catch (error) {
+      return {
+        passed: false,
+        reason: `Organization validation failed: ${error.message}`
+      };
+    }
   }
 
   // Log security attempts for monitoring

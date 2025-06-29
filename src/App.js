@@ -19,50 +19,54 @@ function App() {
   const isMissiveContext = MissiveAPI.checkAvailability();
 
   useEffect(() => {
-    // Security validation on startup
-    try {
-      console.log('🔒 Running initial security validation...');
-      SecurityManager.validateAccess();
-      console.log('✅ Initial security validation passed');
+    const initializeSecurity = async () => {
+      // Security validation on startup
+      try {
+        console.log('🔒 Running initial security validation...');
+        await SecurityManager.validateAccess();
+        console.log('✅ Initial security validation passed including organization check');
+        
+        // Get security status for debugging
+        const status = SecurityManager.getSecurityStatus();
+        setSecurityStatus(status);
+      } catch (securityError) {
+        console.error('🚨 Security validation failed on startup:', securityError);
+        setError(`Security Error: ${securityError.message}`);
+        setSecurityStatus({ error: securityError.message });
+        return; // Don't proceed with normal initialization
+      }
+
+      // Debug logging
+      console.log('🔍 App Debug Info:');
+      console.log('- Window object:', typeof window);
+      console.log('- Missive object:', typeof window.Missive);
+      console.log('- isMissiveContext:', isMissiveContext);
+      console.log('- User Agent:', navigator.userAgent);
+      console.log('- Current URL:', window.location.href);
+      console.log('- Referrer:', document.referrer);
+      console.log('- In iframe:', window.self !== window.top);
       
-      // Get security status for debugging
-      const status = SecurityManager.getSecurityStatus();
-      setSecurityStatus(status);
-    } catch (securityError) {
-      console.error('🚨 Security validation failed on startup:', securityError);
-      setError(`Security Error: ${securityError.message}`);
-      setSecurityStatus({ error: securityError.message });
-      return; // Don't proceed with normal initialization
-    }
+      setDebugInfo(`
+        Missive Available: ${typeof window.Missive !== 'undefined'}
+        Is Missive Context: ${isMissiveContext}
+        URL: ${window.location.href}
+        Referrer: ${document.referrer}
+        In iframe: ${window.self !== window.top}
+        Security Status: ${securityStatus?.error ? 'FAILED' : 'PASSED'}
+        Timestamp: ${new Date().toISOString()}
+      `);
 
-    // Debug logging
-    console.log('🔍 App Debug Info:');
-    console.log('- Window object:', typeof window);
-    console.log('- Missive object:', typeof window.Missive);
-    console.log('- isMissiveContext:', isMissiveContext);
-    console.log('- User Agent:', navigator.userAgent);
-    console.log('- Current URL:', window.location.href);
-    console.log('- Referrer:', document.referrer);
-    console.log('- In iframe:', window.self !== window.top);
-    
-    setDebugInfo(`
-      Missive Available: ${typeof window.Missive !== 'undefined'}
-      Is Missive Context: ${isMissiveContext}
-      URL: ${window.location.href}
-      Referrer: ${document.referrer}
-      In iframe: ${window.self !== window.top}
-      Security Status: ${securityStatus?.error ? 'FAILED' : 'PASSED'}
-      Timestamp: ${new Date().toISOString()}
-    `);
+      if (!isMissiveContext) return;
 
-    if (!isMissiveContext) return;
+      console.log('🔗 Setting up Missive conversation listener...');
 
-    console.log('🔗 Setting up Missive conversation listener...');
+      // Set up Missive API event listener for conversation changes
+      const cleanup = MissiveAPI.onConversationChange(handleConversationChange);
+      
+      return cleanup;
+    };
 
-    // Set up Missive API event listener for conversation changes
-    const cleanup = MissiveAPI.onConversationChange(handleConversationChange);
-    
-    return cleanup;
+    initializeSecurity();
   }, [isMissiveContext]);
 
   // Security wrapper for API calls
@@ -70,7 +74,7 @@ function App() {
     try {
       // Validate security before each API call
       console.log(`🔒 Validating security for ${functionName}...`);
-      SecurityManager.validateAccess();
+      await SecurityManager.validateAccess();
       console.log(`✅ Security validation passed for ${functionName}`);
       
       // Update security status
