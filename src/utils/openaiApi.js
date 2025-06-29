@@ -57,6 +57,57 @@ export class OpenAIAPI {
     }
   }
 
+  static async qualifyFreightForwardingLead(conversationText) {
+    return this.analyzeSalesConversation(conversationText, {
+      maxTokens: 1200,
+      temperature: 0.2,
+      customPrompt: this.getFreightForwardingQualificationPrompt()
+    });
+  }
+
+  static getFreightForwardingQualificationPrompt() {
+    return `You are a lead qualification specialist for a freight forwarding software platform. Analyze the customer inquiry and provide a qualification assessment.
+
+IDEAL CUSTOMER PROFILE:
+- North American freight forwarder (U.S., Canada, or Mexico)
+- Handles at least a few hundred shipments per month (100+ shipments/month is promising)
+- Primary modes: Air freight, LTL, cartage, linehaul, or small parcel
+- U.S. companies must be IAC-certified
+- Canada/Mexico companies need IATA accreditation or equivalent certification
+- Often SMBs or new IACs looking for their first operational platform
+- Value fast quoting, operational efficiency, and excellent support
+- Entry typically through operations or sales users
+
+NOT A FIT:
+- Direct shippers (not freight forwarders)
+- Ocean-only forwarders
+- Companies lacking proper certifications for air forwarding
+
+SPECIAL EMPHASIS:
+- Referrals from partners (Rippy, CaptainCargo, WorldTrak, other freight forwarders) - give extra weight
+- Former users of our platform - very important to highlight
+- Companies mentioning they need a "first operational platform" or are new to the business
+
+FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
+
+**RATING: [HIGH FIT / MEDIUM FIT / LOW FIT / POOR FIT]**
+
+**SUMMARY:**
+[Provide 2-3 paragraph analysis covering:]
+- Company background and what they do
+- Key fit indicators (shipment volume, modes, certifications, location)
+- Any special considerations (referrals, former users, partner mentions)
+- Recommended next steps
+
+RATING GUIDELINES:
+- HIGH FIT: Strong match on most criteria, especially volume + certification + modes
+- MEDIUM FIT: Some good indicators but missing key info or minor concerns - suggest digging deeper
+- LOW FIT: Few positive indicators but could have potential - recommend investigation
+- POOR FIT: Clear mismatch (direct shipper, ocean-only, no certifications, outside region)
+
+Unless it's obviously a terrible fit, lean toward suggesting we dig deeper as there could be hidden potential.`;
+  }
+
   static getDefaultSalesPrompt() {
     return `You are an AI sales assistant analyzing customer email conversations. Your role is to provide actionable insights for sales teams.
 
@@ -85,6 +136,8 @@ Keep your analysis concise, actionable, and focused on sales outcomes. Use bulle
 
   static getCustomPrompts() {
     return {
+      freight_forwarding: this.getFreightForwardingQualificationPrompt(),
+      
       customer_service: `You are analyzing customer service emails. Focus on customer satisfaction, issue resolution, and service improvement opportunities.`,
       
       lead_qualification: `You are analyzing lead qualification emails. Focus on budget, authority, need, timeline (BANT), and lead scoring.`,

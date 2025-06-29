@@ -105,6 +105,18 @@
   background: #2563eb;
 }
 
+/* Freight Forwarding Button - Special Styling */
+.analyze-btn.freight-btn {
+  background: #059669;
+  color: white;
+  border: 2px solid #047857;
+}
+
+.analyze-btn.freight-btn:hover:not(:disabled) {
+  background: #047857;
+  border-color: #065f46;
+}
+
 .analyze-btn.secondary {
   background: #f3f4f6;
   color: #374151;
@@ -174,6 +186,48 @@
 
 .analysis-content p:last-child {
   margin-bottom: 0;
+}
+
+/* Rating Badges */
+.rating-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 16px;
+  border: 2px solid;
+}
+
+.rating-badge.high-fit {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #15803d;
+}
+
+.rating-badge.medium-fit {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #d97706;
+}
+
+.rating-badge.low-fit {
+  background: #fed7d7;
+  border-color: #f56565;
+  color: #c53030;
+}
+
+.rating-badge.poor-fit {
+  background: #fecaca;
+  border-color: #dc2626;
+  color: #991b1b;
+}
+
+.rating-badge.unknown-fit {
+  background: #e5e7eb;
+  border-color: #6b7280;
+  color: #374151;
 }
 
 /* Analysis Section Headers */
@@ -270,6 +324,11 @@
     flex-direction: column;
     gap: 6px;
   }
+  
+  .rating-badge {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 }
 
 /* Loading animation */
@@ -292,6 +351,11 @@
 @keyframes loading {
   0% { left: -100%; }
   100% { left: 100%; }
+}
+
+/* Freight button loading animation */
+.analyze-btn.freight-btn:disabled::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
 }
 
 /* Scrollbar styling */

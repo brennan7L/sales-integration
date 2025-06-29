@@ -65,6 +65,24 @@ function App() {
     }
   };
 
+  const qualifyFreightLead = async () => {
+    if (!conversationData) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const messages = await MissiveAPI.getConversationMessages(conversationData.id);
+      const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+      const qualification = await OpenAIAPI.qualifyFreightForwardingLead(conversationText);
+      setAnalysis(qualification);
+    } catch (err) {
+      setError(err.message || 'Failed to qualify lead');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const quickSentiment = async () => {
     if (!conversationData) return;
 
@@ -107,6 +125,17 @@ function App() {
     return text.split('\n').map((line, index) => {
       // Check if line is a section header (starts with ** and ends with **)
       if (line.match(/^\*\*.*\*\*$/)) {
+        // Special styling for RATING line
+        if (line.includes('RATING:')) {
+          const rating = line.replace(/\*\*/g, '').replace('RATING: ', '');
+          const ratingClass = getRatingClass(rating);
+          return (
+            <div key={index} className={`rating-badge ${ratingClass}`}>
+              <strong>{rating}</strong>
+            </div>
+          );
+        }
+        
         return (
           <h5 key={index} className="analysis-section-header">
             {line.replace(/\*\*/g, '')}
@@ -121,6 +150,14 @@ function App() {
       
       return null;
     }).filter(Boolean);
+  };
+
+  const getRatingClass = (rating) => {
+    if (rating.includes('HIGH FIT')) return 'high-fit';
+    if (rating.includes('MEDIUM FIT')) return 'medium-fit';
+    if (rating.includes('LOW FIT')) return 'low-fit';
+    if (rating.includes('POOR FIT')) return 'poor-fit';
+    return 'unknown-fit';
   };
 
   if (!isMissiveContext) {
@@ -166,6 +203,14 @@ function App() {
             </div>
 
             <div className="action-buttons">
+              <button 
+                className="analyze-btn primary freight-btn"
+                onClick={qualifyFreightLead}
+                disabled={loading}
+              >
+                {loading ? 'Qualifying Lead...' : '🚚 Qualify Freight Lead'}
+              </button>
+              
               <button 
                 className="analyze-btn primary"
                 onClick={analyzeConversation}
