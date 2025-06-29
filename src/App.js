@@ -8,6 +8,8 @@ function App() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [digging, setDigging] = useState(false);
+  const [addingComment, setAddingComment] = useState(false);
+  const [commentAdded, setCommentAdded] = useState(false);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
 
@@ -46,6 +48,8 @@ function App() {
       console.log('📭 No conversation selected, clearing data');
       setConversationData(null);
       setAnalysis(null);
+      setCommentAdded(false);
+      setAddingComment(false);
       return;
     }
 
@@ -58,6 +62,8 @@ function App() {
     setConversationData(conversation);
     setAnalysis(null);
     setError(null);
+    setCommentAdded(false);
+    setAddingComment(false);
   };
 
   const analyzeConversation = async () => {
@@ -180,6 +186,34 @@ function App() {
       setDigging(false);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const addToMissive = async () => {
+    if (!analysis) return;
+
+    setAddingComment(true);
+    setError(null);
+
+    try {
+      console.log('📝 Adding analysis to Missive as comment...');
+      
+      // Format the analysis for Missive comment
+      const formattedComment = MissiveAPI.formatAnalysisForComment(analysis);
+      
+      // Add comment to conversation
+      await MissiveAPI.addCommentToConversation(formattedComment);
+      
+      setCommentAdded(true);
+      console.log('✅ Analysis successfully added to Missive');
+      
+      // Reset success state after 3 seconds
+      setTimeout(() => setCommentAdded(false), 3000);
+    } catch (err) {
+      console.error('❌ Failed to add comment to Missive:', err);
+      setError(err.message || 'Failed to add analysis to Missive');
+    } finally {
+      setAddingComment(false);
     }
   };
 
@@ -407,38 +441,40 @@ function App() {
               </div>
             )}
 
-            <div className="action-buttons">
-              <button 
-                className={`analyze-btn primary gold-strike-btn ${loading ? 'mining' : ''} ${digging ? 'digging' : ''}`}
-                onClick={digForGold}
-                disabled={loading}
-              >
-                {loading ? '⛏️ Mining Deep...' : '⛏️ Dig for Gold!'}
-              </button>
-              {loading && (
-                <div className="mining-animation">
-                  <div className="pickaxe">⛏️</div>
-                  <div className="dirt-particles">
-                    <div className="dirt-particle"></div>
-                    <div className="dirt-particle"></div>
-                    <div className="dirt-particle"></div>
-                    <div className="dirt-particle"></div>
-                    <div className="dirt-particle"></div>
-                    <div className="dirt-particle"></div>
+            {!analysis && (
+              <div className="action-buttons">
+                <button 
+                  className={`analyze-btn primary gold-strike-btn ${loading ? 'mining' : ''} ${digging ? 'digging' : ''}`}
+                  onClick={digForGold}
+                  disabled={loading}
+                >
+                  {loading ? '⛏️ Mining Deep...' : '⛏️ Dig for Gold!'}
+                </button>
+                {loading && (
+                  <div className="mining-animation">
+                    <div className="pickaxe">⛏️</div>
+                    <div className="dirt-particles">
+                      <div className="dirt-particle"></div>
+                      <div className="dirt-particle"></div>
+                      <div className="dirt-particle"></div>
+                      <div className="dirt-particle"></div>
+                      <div className="dirt-particle"></div>
+                      <div className="dirt-particle"></div>
+                    </div>
+                    <div className="mining-text">Prospecting for gold nuggets...</div>
                   </div>
-                  <div className="mining-text">Prospecting for gold nuggets...</div>
-                </div>
-              )}
-              {digging && !loading && (
-                <div className="gold-particles">
-                  <div className="particle"></div>
-                  <div className="particle"></div>
-                  <div className="particle"></div>
-                  <div className="particle"></div>
-                  <div className="particle"></div>
-                </div>
-              )}
-            </div>
+                )}
+                {digging && !loading && (
+                  <div className="gold-particles">
+                    <div className="particle"></div>
+                    <div className="particle"></div>
+                    <div className="particle"></div>
+                    <div className="particle"></div>
+                    <div className="particle"></div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {error && (
               <div className="error-message">
@@ -466,14 +502,16 @@ function App() {
                   </div>
                 )}
 
-                {/* Re-analysis button after results */}
-                <div className="action-buttons re-analyze">
+                {/* Add to Missive button after results */}
+                <div className="action-buttons add-to-missive">
                   <button 
-                    className={`analyze-btn secondary gold-strike-btn ${loading ? 'mining' : ''} ${digging ? 'digging' : ''}`}
-                    onClick={digForGold}
-                    disabled={loading}
+                    className={`analyze-btn missive-btn ${commentAdded ? 'success' : ''} ${addingComment ? 'loading' : ''}`}
+                    onClick={addToMissive}
+                    disabled={addingComment || commentAdded}
                   >
-                    {loading ? '⛏️ Mining Deep...' : '⛏️ Dig Again!'}
+                    {addingComment ? '📝 Adding to Missive...' : 
+                     commentAdded ? '✅ Added to Missive!' : 
+                     '📝 Add to Missive'}
                   </button>
                 </div>
               </>

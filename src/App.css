@@ -832,4 +832,46 @@
   background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
   border-color: #ffd700;
   transform: translateY(-2px);
+}
+
+/* Add to Missive button styling */
+.action-buttons.add-to-missive {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.analyze-btn.missive-btn {
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  border-color: #6366f1;
+  color: white;
+  font-size: 14px;
+  padding: 12px 24px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.analyze-btn.missive-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%);
+  border-color: #7c3aed;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(75, 85, 99, 0.4);
+}
+
+.analyze-btn.missive-btn.loading {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  border-color: #9ca3af;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.analyze-btn.missive-btn.success {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border-color: #10b981;
+  animation: successPulse 0.6s ease-out;
+}
+
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 } 
