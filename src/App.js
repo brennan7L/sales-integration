@@ -8,11 +8,27 @@ function App() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [debugInfo, setDebugInfo] = useState('');
 
-  // Check if we're running inside Missive
+  // Check if we're running inside Missive with debug info
   const isMissiveContext = MissiveAPI.checkAvailability();
 
   useEffect(() => {
+    // Debug logging
+    console.log('🔍 App Debug Info:');
+    console.log('- Window object:', typeof window);
+    console.log('- Missive object:', typeof window.Missive);
+    console.log('- isMissiveContext:', isMissiveContext);
+    console.log('- User Agent:', navigator.userAgent);
+    console.log('- Current URL:', window.location.href);
+    
+    setDebugInfo(`
+      Missive Available: ${typeof window.Missive !== 'undefined'}
+      Is Missive Context: ${isMissiveContext}
+      URL: ${window.location.href}
+      Timestamp: ${new Date().toISOString()}
+    `);
+
     if (!isMissiveContext) return;
 
     // Set up Missive API event listener
@@ -21,16 +37,18 @@ function App() {
     // Get initial conversation if one is selected
     MissiveAPI.getSelectedConversation()
       .then(conversation => {
+        console.log('🔍 Initial conversation:', conversation);
         if (conversation) {
           handleConversationChange(conversation);
         }
       })
-      .catch(err => console.log('No conversation selected initially'));
+      .catch(err => console.log('No conversation selected initially:', err));
 
     return cleanup;
   }, [isMissiveContext]);
 
   const handleConversationChange = async (conversation) => {
+    console.log('🔄 Conversation changed:', conversation);
     if (!conversation) {
       setConversationData(null);
       setAnalysis(null);
@@ -166,6 +184,18 @@ function App() {
         <div className="setup-message">
           <h2>🚀 Missive Sales Assistant</h2>
           <p>This app is designed to run as a Missive sidebar integration.</p>
+          
+          <div className="debug-info">
+            <h3>🔍 Debug Information:</h3>
+            <pre>{debugInfo}</pre>
+            <p><strong>If you're seeing this in Missive:</strong></p>
+            <ul>
+              <li>Clear browser cache and restart Missive</li>
+              <li>Check browser console for errors</li>
+              <li>Try adding <code>?v=3</code> to the integration URL</li>
+            </ul>
+          </div>
+          
           <p><strong>Setup Instructions:</strong></p>
           <ol>
             <li>Deploy this app to Netlify</li>
@@ -192,6 +222,12 @@ function App() {
         {!conversationData ? (
           <div className="no-conversation">
             <p>👈 Select a conversation to analyze</p>
+            <div className="debug-info-small">
+              <details>
+                <summary>Debug Info</summary>
+                <pre>{debugInfo}</pre>
+              </details>
+            </div>
           </div>
         ) : (
           <div className="conversation-info">
