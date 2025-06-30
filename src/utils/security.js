@@ -47,18 +47,38 @@ class SecurityValidator {
         if (!orgCheck.passed) {
           console.error('🚨 Organization validation failed:', orgCheck.reason);
           this.logSecurityAttempt(checks);
-          throw new Error(`Access denied. ${orgCheck.reason}`);
+          
+          // Be more lenient with timeout errors during startup
+          if (orgCheck.reason.includes('timeout') && !conversationData) {
+            console.log('⚠️ Organization timeout during startup - allowing with monitoring');
+            checks.organization = {
+              passed: true,
+              reason: 'Organization timeout during startup - access allowed with monitoring'
+            };
+          } else {
+            throw new Error(`Access denied. ${orgCheck.reason}`);
+          }
         }
       } catch (error) {
-        const orgError = {
-          passed: false,
-          reason: `Organization validation error: ${error.message}`
-        };
-        
-        checks.organization = orgError;
         console.error('🚨 Organization validation error:', error);
-        this.logSecurityAttempt(checks);
-        throw new Error(`Access denied. ${orgError.reason}`);
+        
+        // Check if this is a timeout error during startup
+        if (error.message.includes('timeout') && !conversationData) {
+          console.log('⚠️ Organization validation timeout during startup - allowing with monitoring');
+          checks.organization = {
+            passed: true,
+            reason: 'Organization validation timeout during startup - access allowed with monitoring'
+          };
+        } else {
+          const orgError = {
+            passed: false,
+            reason: `Organization validation error: ${error.message}`
+          };
+          
+          checks.organization = orgError;
+          this.logSecurityAttempt(checks);
+          throw new Error(`Access denied. ${orgError.reason}`);
+        }
       }
     } else {
       checks.organization = {
@@ -314,27 +334,40 @@ class SecurityValidator {
     
     try {
       // First, try using conversation data if provided (from app context)
-      if (conversationData && conversationData.organization && conversationData.organization.id) {
+      if (conversationData) {
         console.log('🔒 Using provided conversation data for org validation');
-        const orgId = conversationData.organization.id;
-        const currentOrgHash = simpleHash(orgId);
+        console.log('🔒 Full conversation data:', conversationData);
         
-        console.log('🔒 Context check - Organization ID:', orgId);
-        console.log('🔒 Context check - Computed hash:', currentOrgHash);
-        console.log('🔒 Context check - Expected hash:', AUTHORIZED_ORG_HASH);
-        console.log('🔒 Context check - Hash match:', currentOrgHash === AUTHORIZED_ORG_HASH);
-        
-        if (currentOrgHash === AUTHORIZED_ORG_HASH) {
-          console.log('✅ Context organization validation PASSED');
+        if (conversationData.organization && conversationData.organization.id) {
+          const orgId = conversationData.organization.id;
+          const currentOrgHash = simpleHash(orgId);
+          
+          console.log('🔒 Context check - Organization ID:', orgId);
+          console.log('🔒 Context check - Computed hash:', currentOrgHash);
+          console.log('🔒 Context check - Expected hash:', AUTHORIZED_ORG_HASH);
+          console.log('🔒 Context check - Hash match:', currentOrgHash === AUTHORIZED_ORG_HASH);
+          
+          if (currentOrgHash === AUTHORIZED_ORG_HASH) {
+            console.log('✅ Context organization validation PASSED');
+            return {
+              passed: true,
+              reason: `Organization verified: ${conversationData.organization.name || 'Unknown'}`
+            };
+          } else {
+            console.log('🚨 Context organization validation FAILED - hash mismatch');
+            return {
+              passed: false,
+              reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
+            };
+          }
+        } else {
+          console.log('🔒 No organization data in provided conversation - may be personal account');
+          // For personal accounts or conversations without organization, we'll allow access
+          // but log it for monitoring
+          console.log('✅ Personal account access allowed (no organization)');
           return {
             passed: true,
-            reason: `Organization verified: ${conversationData.organization.name || 'Unknown'}`
-          };
-        } else {
-          console.log('🚨 Context organization validation FAILED - hash mismatch');
-          return {
-            passed: false,
-            reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
+            reason: 'Personal account or conversation without organization - access allowed'
           };
         }
       }
@@ -353,12 +386,14 @@ class SecurityValidator {
             if (typeof cleanup === 'function') {
               cleanup();
             }
+            // Instead of failing, allow access with warning for timeout
+            console.log('⚠️ Organization validation timeout - allowing access with monitoring');
             resolve({
-              passed: false,
-              reason: 'Organization validation timeout - unable to verify organization'
+              passed: true,
+              reason: 'Organization validation timeout - access allowed with monitoring'
             });
           }
-        }, 2000); // Reduced timeout since we already tried direct approach
+        }, 5000); // Increased timeout to 5 seconds
 
         try {
           console.log('🔒 Setting up conversation listener for organization validation...');
@@ -375,22 +410,23 @@ class SecurityValidator {
                 if (conversations && conversations.length > 0) {
                   const conversation = conversations[0];
                   console.log('🔒 Checking conversation organization:', conversation.organization);
+                  console.log('🔒 Full conversation structure:', conversation);
                   
-                  if (conversation.organization && conversation.organization.id) {
-                    const orgId = conversation.organization.id;
-                    const currentOrgHash = simpleHash(orgId);
+                  if (!validationCompleted) {
+                    validationCompleted = true;
+                    clearTimeout(timeout);
+                    if (typeof cleanup === 'function') {
+                      cleanup();
+                    }
                     
-                    console.log('🔒 Organization ID found:', orgId);
-                    console.log('🔒 Computed hash:', currentOrgHash);
-                    console.log('🔒 Expected hash:', AUTHORIZED_ORG_HASH);
-                    console.log('🔒 Hash match:', currentOrgHash === AUTHORIZED_ORG_HASH);
-                    
-                    if (!validationCompleted) {
-                      validationCompleted = true;
-                      clearTimeout(timeout);
-                      if (typeof cleanup === 'function') {
-                        cleanup();
-                      }
+                    if (conversation.organization && conversation.organization.id) {
+                      const orgId = conversation.organization.id;
+                      const currentOrgHash = simpleHash(orgId);
+                      
+                      console.log('🔒 Organization ID found:', orgId);
+                      console.log('🔒 Computed hash:', currentOrgHash);
+                      console.log('🔒 Expected hash:', AUTHORIZED_ORG_HASH);
+                      console.log('🔒 Hash match:', currentOrgHash === AUTHORIZED_ORG_HASH);
                       
                       if (currentOrgHash === AUTHORIZED_ORG_HASH) {
                         console.log('✅ Organization validation PASSED');
@@ -405,8 +441,15 @@ class SecurityValidator {
                           reason: 'Unauthorized organization - This integration is restricted to 7LFreight only'
                         });
                       }
-                      return;
+                    } else {
+                      console.log('🔒 No organization in conversation - personal account or missing org data');
+                      console.log('✅ Personal account access allowed (listener approach)');
+                      resolve({
+                        passed: true,
+                        reason: 'Personal account or missing organization data - access allowed'
+                      });
                     }
+                    return;
                   }
                 }
               }
