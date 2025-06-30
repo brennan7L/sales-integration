@@ -508,18 +508,65 @@ FORMAT YOUR PREMIUM ANALYSIS WITH MAXIMUM DETAIL:
 
 **COMPREHENSIVE CRITERIA ASSESSMENT:**
 
-| Criteria | Detailed Assessment | Evidence Quality | Confidence Level | Risk Factors |
-|----------|-------------------|------------------|------------------|--------------|
-| North American Presence | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| True Freight Forwarder | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| Volume Capacity (100+/month) | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| Transportation Mode Focus | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| Certification Compliance | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| Multi-location Operations | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| Technology Sophistication | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| Previous Platform Experience | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| Budget & Decision Authority | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
-| Strategic Partnership Potential | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+🌎 **North American Presence**
+• Assessment: [Detailed geographic analysis]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Specific geographic concerns]
+
+🚛 **True Freight Forwarder Status**
+• Assessment: [Business model verification]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Business type concerns]
+
+📦 **Volume Capacity (100+/month)**
+• Assessment: [Volume analysis and validation]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Volume verification needs]
+
+🚚 **Transportation Mode Focus**
+• Assessment: [Primary and secondary modes analysis]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Mode alignment concerns]
+
+🏅 **Certification Compliance**
+• Assessment: [IAC/IATA status verification]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Compliance verification needs]
+
+🏢 **Multi-location Operations**
+• Assessment: [Geographic footprint analysis]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Scalability concerns]
+
+💻 **Technology Sophistication**
+• Assessment: [Digital transformation readiness]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Technology adoption risks]
+
+🔄 **Previous Platform Experience**
+• Assessment: [Platform history and switching patterns]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Implementation concerns]
+
+💰 **Budget & Decision Authority**
+• Assessment: [Financial capacity and authority signals]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Budget and decision risks]
+
+🤝 **Strategic Partnership Potential**
+• Assessment: [Long-term relationship value]
+• Evidence: Strong/Medium/Weak
+• Confidence: High/Medium/Low
+• Risk Factors: [Partnership viability concerns]
 
 ## 🎯 PREMIUM FIT ASSESSMENT
 
