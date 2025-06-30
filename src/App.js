@@ -256,6 +256,42 @@ function App() {
     }
   };
 
+  // Premium Deep Dig Analysis - maximum intelligence with GPT-4o
+  const premiumDeepDig = async () => {
+    if (!conversationData) return;
+
+    setLoading(true);
+    setDigging(true);
+    setError(null);
+
+    try {
+      console.log('💎 Starting premium deep dig analysis for:', conversationData.id);
+      
+      // Use secure API call wrapper
+      const diamondStrike = await secureApiCall(async () => {
+        const messages = await MissiveAPI.getConversationMessages(conversationData);
+        const conversationText = MissiveAPI.formatConversationForAnalysis(messages);
+        
+        // Add a longer delay for premium analysis
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Call premium analysis with GPT-4o
+        return await OpenAIAPI.premiumDeepDig(conversationText);
+      }, 'Premium Deep Dig Analysis');
+      
+      setAnalysis(diamondStrike);
+      
+      // Show success animation briefly
+      setTimeout(() => setDigging(false), 2500);
+    } catch (err) {
+      console.error('❌ Premium deep dig error:', err);
+      setError(err.message || 'Failed to complete premium analysis');
+      setDigging(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const addToMissive = async () => {
     if (!analysis) return;
 
@@ -580,9 +616,9 @@ function App() {
               </div>
             )}
 
-            {/* Dig for Gold button - Top placement on initial page */}
+            {/* Dig for Gold buttons - Top placement on initial page */}
             {!analysis && !loading && (
-              <div className="action-buttons initial-dig-button">
+              <div className="action-buttons initial-dig-buttons">
                 <button 
                   className="analyze-btn primary gold-strike-btn"
                   onClick={digForGold}
@@ -590,6 +626,16 @@ function App() {
                 >
                   ⛏️ Dig for Gold!
                 </button>
+                <button 
+                  className="analyze-btn premium diamond-strike-btn"
+                  onClick={premiumDeepDig}
+                  disabled={loading}
+                >
+                  💎 Premium Deep Dig
+                </button>
+                <div className="premium-note">
+                  <small>💎 Premium uses GPT-4o for maximum intelligence</small>
+                </div>
               </div>
             )}
 

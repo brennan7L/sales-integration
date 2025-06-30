@@ -412,6 +412,60 @@
   }
 }
 
+/* Premium Diamond Button */
+.analyze-btn.diamond-strike-btn {
+  background: linear-gradient(135deg, #b8b8ff 0%, #9d4edd 25%, #c77dff 50%, #7209b7 75%, #480ca8 100%);
+  border: 2px solid #e0aaff;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 4px 15px rgba(157, 78, 221, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: diamondPulse 3s ease-in-out infinite;
+}
+
+.analyze-btn.diamond-strike-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c8c8ff 0%, #ad5eed 25%, #d78dff 50%, #8219c7 75%, #5811b8 100%);
+  box-shadow: 
+    0 6px 20px rgba(157, 78, 221, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  border-color: #f0baff;
+}
+
+.analyze-btn.diamond-strike-btn:before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%);
+  transform: rotate(45deg);
+  animation: diamondShine 4s ease-in-out infinite;
+}
+
+@keyframes diamondPulse {
+  0%, 100% { 
+    box-shadow: 
+      0 4px 15px rgba(157, 78, 221, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% { 
+    box-shadow: 
+      0 6px 25px rgba(157, 78, 221, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes diamondShine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
 .analyze-btn.secondary {
   background: #f3f4f6;
   color: #374151;
@@ -1399,6 +1453,39 @@
   padding: 15px 30px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* Initial dig buttons (with premium option) */
+.initial-dig-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 16px;
+  align-items: center;
+}
+
+.initial-dig-buttons .analyze-btn {
+  min-width: 200px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.premium-note {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.premium-note small {
+  color: #7c3aed;
+  font-weight: 500;
+  font-size: 11px;
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid #c4b5fd;
+  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.2);
 }
 
 /* Security badge */
