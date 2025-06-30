@@ -421,15 +421,15 @@ FORMAT YOUR PREMIUM ANALYSIS WITH MAXIMUM DETAIL:
 
 ## 💎 PREMIUM PROSPECT SCORECARD
 
-**⭐ PROSPECT RATING: [GOLD STRIKE! / SILVER NUGGET / COPPER FIND / FOOL'S GOLD]**
+**⭐ PROSPECT RATING: GOLD STRIKE! / SILVER NUGGET / COPPER FIND / FOOL'S GOLD**
 
-**💰 OPPORTUNITY SCORE: [EXCEPTIONAL / HIGH / MEDIUM / LOW]**
+**💰 OPPORTUNITY SCORE: EXCEPTIONAL / HIGH / MEDIUM / LOW**
 
-**😊 SENTIMENT: [HIGHLY POSITIVE / POSITIVE / NEUTRAL / NEGATIVE]** 
+**😊 SENTIMENT: HIGHLY POSITIVE / POSITIVE / NEUTRAL / NEGATIVE** 
 
-**⚡ URGENCY: [IMMEDIATE / SOON / MEDIUM-TERM / LONG-TERM / UNKNOWN]**
+**⚡ URGENCY: IMMEDIATE / SOON / MEDIUM-TERM / LONG-TERM / UNKNOWN**
 
-**🎯 STRATEGIC VALUE: [GAME-CHANGER / HIGH-VALUE / STANDARD / LOW-PRIORITY]**
+**🎯 STRATEGIC VALUE: GAME-CHANGER / HIGH-VALUE / STANDARD / LOW-PRIORITY**
 
 ## 💎 PREMIUM INTELLIGENCE REPORT
 
@@ -510,20 +510,20 @@ FORMAT YOUR PREMIUM ANALYSIS WITH MAXIMUM DETAIL:
 
 | Criteria | Detailed Assessment | Evidence Quality | Confidence Level | Risk Factors |
 |----------|-------------------|------------------|------------------|--------------|
-| North American Presence | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| True Freight Forwarder | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| Volume Capacity (100+/month) | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| Transportation Mode Focus | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| Certification Compliance | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| Multi-location Operations | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| Technology Sophistication | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| Previous Platform Experience | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| Budget & Decision Authority | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
-| Strategic Partnership Potential | [Specific assessment] | [Strong/Medium/Weak] | [High/Medium/Low] | [Risk details] |
+| North American Presence | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| True Freight Forwarder | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| Volume Capacity (100+/month) | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| Transportation Mode Focus | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| Certification Compliance | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| Multi-location Operations | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| Technology Sophistication | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| Previous Platform Experience | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| Budget & Decision Authority | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
+| Strategic Partnership Potential | Specific assessment | Strong/Medium/Weak | High/Medium/Low | Risk details |
 
 ## 🎯 PREMIUM FIT ASSESSMENT
 
-**OVERALL ICP ALIGNMENT SCORE: [95-100% / 85-94% / 70-84% / 50-69% / <50%]**
+**OVERALL ICP ALIGNMENT SCORE: 95-100% / 85-94% / 70-84% / 50-69% / <50%**
 
 [Executive summary of prospect alignment with ideal customer profile, including quantified confidence levels and strategic value assessment]
 
